@@ -23,19 +23,18 @@ async function main() {
   const erc20 = erc20Factory.attach(erc20Address)
 
   /**CONTRACT SETUP */
-  const mstableProvider = await MStableProvider.deploy(
-    "0x4E1000616990D83e56f4b5fC6CC8602DcfD20459", //IMasset _masset, 
-    "0x300e56938454A4d8005B2e84eefFca002B3a24Bc" //ISavingsContract _savings
-  );
+  // const mstableProvider = await MStableProvider.deploy(
+  //   "0x4E1000616990D83e56f4b5fC6CC8602DcfD20459", //MAsset, 
+  //   "0x300e56938454A4d8005B2e84eefFca002B3a24Bc", //ISavingsContract
+  // );
 
-  // const deployedAt = "0x9C33B3043EAabcb3932D93BA6471E8B47DC8d578"
-  // const mstableProvider = MStableProvider.attach(deployedAt)
+  const deployedAt = "0x7435B4a4D26Ce42a04B81f65508e7D26F4C7A1E7"
+  const mstableProvider = MStableProvider.attach(deployedAt)
 
   await mstableProvider.deployed();
-  await mstableProvider.approveToken(erc20Address);
-  
-  console.log("MStableProvider deployed to:", mstableProvider.address);
+  (await mstableProvider.approveToken(erc20Address)).wait();
 
+  console.log("MStableProvider deployed to:", mstableProvider.address);
 
   /**SENDER SETUP */
 
@@ -44,13 +43,13 @@ async function main() {
   console.log('allowance', allowance.toString())
   const approved = await erc20.approve(mstableProvider.address, '20000000')
   await approved.wait()
-  console.log('allowance', (await erc20.allowance(signerAddress, mstableProvider.address)).toString() )
-  
+  console.log('allowance', (await erc20.allowance(signerAddress, mstableProvider.address)).toString())
+
 
   /**ACTION */
   const result = await mstableProvider.deposit(erc20Address, '1000000', {
     gasLimit: 1000000,
-    gasPrice: 50 * 1000000000
+    gasPrice: 20 * 1000000000
   })
 
   console.log('deposit hash', result.hash)

@@ -12,13 +12,16 @@ contract MStableProvider
     /*is IElDoradoSavingsProvider*/
      {
 
-    IMasset masset;
-    ISavingsContract savings;
-    bool isInit = false;
+    IMasset private masset;
+    ISavingsContract private savings;
+    IERC20 private mUSD;
 
-    constructor(IMasset _masset, ISavingsContract _savings) public {
-        masset = _masset;
+    constructor(address _masset, 
+                ISavingsContract _savings
+                ) public {
+        masset = IMasset(_masset);
         savings = _savings;
+        mUSD = IERC20(_masset);
     }    
 
     function approveToken(uint256 _tokenAddress) external returns(bool){
@@ -27,7 +30,7 @@ contract MStableProvider
         IERC20 token = IERC20(_tokenAddress);
         token.approve(address(masset), uint256(-1));
         token.approve(address(savings), uint256(-1));
-        isInit = true;
+        mUSD.approve(address(savings), uint256(-1));
     }
 
     function deposit(
@@ -43,17 +46,15 @@ contract MStableProvider
         uint256 balance = token.balanceOf(msg.sender);
         require(balance > _amount, "Insufficient balance");
 
-        // uint256 allowance = token.allowance(msg.sender, address(this));
-        // if(allowance < _amount){
-        //     console.log("Increasing allowance from %s to %s", allowance, _amount);
-        //     token.approve(msg.sender, _amount); //safeApprove?
-        // }
-
+        // Temp transfer bAsset to this contract
         token.transferFrom(msg.sender, address(this), _amount);
-        
+        // mint baset to get masset
         uint256 massetsMinted = masset.mintTo(_tokenAddress, _amount, address(this));
 
+        // deposit masset
         savings.depositSavings(massetsMinted);
+
+        //TODO: keep track of deposited amounts
 
         return massetsMinted;
     }
