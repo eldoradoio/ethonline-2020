@@ -18,6 +18,8 @@ contract MStableProvider
     IERC20 private mUSD;
     IMStableHelper private helper;
 
+    uint256 private totalDepossited;
+
     constructor(
             address _masset, 
             ISavingsContract _savings,
@@ -27,6 +29,7 @@ contract MStableProvider
         savings = _savings;
         mUSD = IERC20(_masset);
         helper = _helper;
+        totalDepossited = 0;
     }    
 
     function approveToken(uint256 _tokenAddress) external returns(bool){
@@ -55,9 +58,9 @@ contract MStableProvider
         token.transferFrom(msg.sender, address(this), _amount);
         // mint basset to get masset
         uint256 massetsMinted = masset.mintTo(_tokenAddress, _amount, address(this));
-
+        totalDepossited = totalDepossited + massetsMinted;
         // deposit masset
-        //savings.depositSavings(massetsMinted);
+        savings.depositSavings(massetsMinted);
 
         //TODO: keep track of deposited amounts
 
@@ -71,26 +74,42 @@ contract MStableProvider
         );
     }
 
+    function earntOf() external view returns(uint256) {
+        uint256 balance = helper.getSaveBalance(savings,address(this));
+        if(balance < totalDepossited)
+            return 0;
+        return  balance - totalDepossited;
+    }
+
+
+    function stop(
+        address _tokenAddress,
+        uint256 _amount
+    ) external returns(uint256){
+        uint256 creditUnits = _getSaveRedeemInput(_amount - 1);     
+        uint256 massetReturned = savings.redeem(creditUnits);
+        return massetReturned;
+    }
+
     function withdraw(
         address _tokenAddress,
         uint256 _amount
-    ) external returns(
-            //uint256, uint256, 
-            uint256){
-        
-        // uint256 creditUnits = helper.getSaveRedeemInput(
-        //     savings,
-        //     _amount
-        // );
-        
-        // uint256 massetReturned = savings.redeem( creditUnits);
+    ) external returns(uint256){
         uint256 redeemed = masset.redeemTo(address(_tokenAddress), _amount, msg.sender);
-
-        return (
-            //creditUnits, massetReturned,
-            redeemed);
+        return redeemed;
     }
 
+
+    function _getSaveRedeemInput(uint256 _amount) internal view returns(uint256){
+       return  helper.getSaveRedeemInput(
+            savings,
+            _amount * 1000000000000  //TODO Diff from token and mstable digits????
+        );
+    }
+
+    function getSaveRedeemInput(uint256 _amount) external view returns(uint256){
+       return  _getSaveRedeemInput(_amount);
+    }
 
     /* TODO: with the helper, we can call this and maybe swap to get that one?
     function suggestMintAsset(

@@ -13,7 +13,7 @@ async function main() {
     signerAddress
   );
 
-  console.log("Account balance:", (await deployer.getBalance()).toString());
+  console.log("Account ETH balance:", (await deployer.getBalance()).div('1000000000000000000').toString());
 
 
   const MStableProvider = await ethers.getContractFactory("MStableProvider");
@@ -44,6 +44,7 @@ async function main() {
 
   const printBalances = async () => {
     console.log('* Savings balance', (await mstableProvider.balanceOf()).toString());
+    console.log('* Earnt balance', (await mstableProvider.earntOf()).toString());
     console.log('* User ERC20 balance', (await erc20.balanceOf(signerAddress)).toString())
     console.log('* Provider mStable balance', (await mAsset.balanceOf(mstableProviderAddress)).toString())
   }
@@ -55,13 +56,13 @@ async function main() {
   await approved.wait()
   //console.log('allowance', (await erc20.allowance(signerAddress, mstableProviderAddress)).toString())
 
-  const amount = '100'
+  const amount = '50'
 
-  await printBalances();
-
+  
   /*
   * DEPOSIT 
   */
+  await printBalances();
   console.log('')
   console.log('Depositing')
  
@@ -73,16 +74,16 @@ async function main() {
   console.log('deposit hash', result.hash)
   await result.wait()
 
-  await printBalances();
-
+  console.log('getSaveRedeemInput', (await mstableProvider.getSaveRedeemInput(amount)).toString());
 
   /**
-   * WITHDRAW
+   * Stop
    */
+  await printBalances();
   console.log('')
-  console.log('Withdrawing')
+  console.log('Stopping')
 
-  const withdrawResult = await mstableProvider.withdraw(
+  const stop = await mstableProvider.stop(
     erc20Address, // address _tokenAddress,
     amount, // uint256 _amount,
     {
@@ -90,8 +91,27 @@ async function main() {
       gasPrice: 20 * 1000000000
     }
   )
-  console.log('withdrawResult1', withdrawResult.hash)
-  await withdrawResult.wait()
+  console.log('stop', stop.hash)
+  await stop.wait()
+
+
+  // /**
+  //  * WITHDRAW
+  //  */
+  // await printBalances();
+  // console.log('')
+  // console.log('Withdrawing')
+
+  // const withdrawResult = await mstableProvider.withdraw(
+  //   erc20Address, // address _tokenAddress,
+  //   amount, // uint256 _amount,
+  //   {
+  //     gasLimit: 1000000,
+  //     gasPrice: 20 * 1000000000
+  //   }
+  // )
+  // console.log('withdrawResult1', withdrawResult.hash)
+  // await withdrawResult.wait()
 
 
   /**
