@@ -2,6 +2,7 @@
 pragma solidity >=0.5.15;
 
 import "@mstable/protocol/contracts/interfaces/IMasset.sol";
+import "@mstable/protocol/contracts/interfaces/IMStableHelper.sol";
 import "@mstable/protocol/contracts/interfaces/ISavingsContract.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../../IElDoradoSavingsProvider.sol";
@@ -15,13 +16,17 @@ contract MStableProvider
     IMasset private masset;
     ISavingsContract private savings;
     IERC20 private mUSD;
+    IMStableHelper private helper;
 
-    constructor(address _masset, 
-                ISavingsContract _savings
-                ) public {
+    constructor(
+            address _masset, 
+            ISavingsContract _savings,
+            IMStableHelper _helper
+    ) public {
         masset = IMasset(_masset);
         savings = _savings;
         mUSD = IERC20(_masset);
+        helper = _helper;
     }    
 
     function approveToken(uint256 _tokenAddress) external returns(bool){
@@ -48,23 +53,43 @@ contract MStableProvider
 
         // Temp transfer bAsset to this contract
         token.transferFrom(msg.sender, address(this), _amount);
-        // mint baset to get masset
+        // mint basset to get masset
         uint256 massetsMinted = masset.mintTo(_tokenAddress, _amount, address(this));
 
         // deposit masset
-        savings.depositSavings(massetsMinted);
+        //savings.depositSavings(massetsMinted);
 
         //TODO: keep track of deposited amounts
 
         return massetsMinted;
     }
 
-    // function withdraw(
-    //     address _tokenAddress,
-    //     uint256 _amount
-    // ){
+    function balanceOf() external view returns(uint256) {
+       return helper.getSaveBalance(
+            savings,
+            address(this)
+        );
+    }
 
-    // }
+    function withdraw(
+        address _tokenAddress,
+        uint256 _amount
+    ) external returns(
+            //uint256, uint256, 
+            uint256){
+        
+        // uint256 creditUnits = helper.getSaveRedeemInput(
+        //     savings,
+        //     _amount
+        // );
+        
+        // uint256 massetReturned = savings.redeem( creditUnits);
+        uint256 redeemed = masset.redeemTo(address(_tokenAddress), _amount, msg.sender);
+
+        return (
+            //creditUnits, massetReturned,
+            redeemed);
+    }
 
 
     /* TODO: with the helper, we can call this and maybe swap to get that one?
