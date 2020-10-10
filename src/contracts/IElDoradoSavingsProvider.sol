@@ -1,7 +1,7 @@
 //SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.6.8;
+pragma solidity >=0.5.15;
 
-contract IElDoradoSavingsProvider {
+interface IElDoradoSavingsProvider {
   
-    
+    function deposit() external view returns(bool);
 }

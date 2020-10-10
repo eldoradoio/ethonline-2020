@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
-    "@openzeppelin/contracts": "^3.2.0"
+    "@mstable/protocol": "^1.2.1",
+    "@openzeppelin/contracts": "^2.5.1"
   },
   "devDependencies": {
     "@nomiclabs/buidler": "^1.4.7",
