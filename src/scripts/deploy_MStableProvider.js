@@ -43,12 +43,10 @@ async function main() {
   /**SENDER SETUP */
 
   const printBalances = async () => {
-    console.log('Savings balance', (await mstableProvider.balanceOf()).toString());
-    console.log('User ERC20 balance', (await erc20.balanceOf(signerAddress)).toString())
-    console.log('PROVIDER mstable balance', (await mAsset.balanceOf(mstableProviderAddress)).toString())
+    console.log('* Savings balance', (await mstableProvider.balanceOf()).toString());
+    console.log('* User ERC20 balance', (await erc20.balanceOf(signerAddress)).toString())
+    console.log('* Provider mStable balance', (await mAsset.balanceOf(mstableProviderAddress)).toString())
   }
-
-  await printBalances();
 
   console.log('')
   const allowance = await erc20.allowance(signerAddress, mstableProviderAddress);
@@ -61,7 +59,12 @@ async function main() {
 
   await printBalances();
 
-  // /**ACTION */
+  /*
+  * DEPOSIT 
+  */
+  console.log('')
+  console.log('Depositing')
+ 
   const result = await mstableProvider.deposit(erc20Address, amount, {
     gasLimit: 1000000,
     gasPrice: 20 * 1000000000
