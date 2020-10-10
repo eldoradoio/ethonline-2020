@@ -25,13 +25,13 @@ async function main() {
   const mAsset = erc20Factory.attach(MAssetAddress)
 
   /**CONTRACT SETUP */
-  const mstableProvider = await MStableProvider.deploy(
-    MAssetAddress, //MAsset, 
-    "0x300e56938454A4d8005B2e84eefFca002B3a24Bc", //ISavingsContract
-    "0x1c0de4e659e76d3c876813ff2ba9dc2da07ab658" //Helper
-  );
+  // const mstableProvider = await MStableProvider.deploy(
+  //   MAssetAddress, //MAsset, 
+  //   "0x300e56938454A4d8005B2e84eefFca002B3a24Bc", //ISavingsContract
+  //   "0x1c0de4e659e76d3c876813ff2ba9dc2da07ab658" //Helper
+  // );
 
-  //const mstableProvider = MStableProvider.attach("0xaB99E8c45Add0BdEbabeA95e75CCC2B85845f9ce")
+  const mstableProvider = MStableProvider.attach("0x5EE9a1831F7E5c1629D0428809749061A617431f")
 
   const mstableProviderAddress = mstableProvider.address;
 
@@ -56,34 +56,37 @@ async function main() {
   await approved.wait()
   //console.log('allowance', (await erc20.allowance(signerAddress, mstableProviderAddress)).toString())
 
-  const amount = '50'
-
-  
-  /*
-  * DEPOSIT 
-  */
+  const amount = '2500000'
   await printBalances();
-  console.log('')
-  console.log('Depositing')
+  
+  return;
+  // /*
+  // * DEPOSIT 
+  // */
+  // await printBalances();
+  // console.log('')
+  // console.log('Depositing')
  
-  const result = await mstableProvider.deposit(erc20Address, amount, {
-    gasLimit: 1000000,
-    gasPrice: 20 * 1000000000
-  })
+  // const result = await mstableProvider.deposit(erc20Address, amount, {
+  //   gasLimit: 1000000,
+  //   gasPrice: 20 * 1000000000
+  // })
 
-  console.log('deposit hash', result.hash)
-  await result.wait()
+  // console.log('deposit hash', result.hash)
+  // await result.wait()
 
-  console.log('getSaveRedeemInput', (await mstableProvider.getSaveRedeemInput(amount)).toString());
+  // console.log('getSaveRedeemInput', (await mstableProvider.getSaveRedeemInput(amount)).toString());
+
+ return;
 
   /**
-   * Stop
+   * WITHDRAW
    */
   await printBalances();
   console.log('')
-  console.log('Stopping')
+  console.log('Withdrawing')
 
-  const stop = await mstableProvider.stop(
+  const withdrawResult = await mstableProvider.withdraw(
     erc20Address, // address _tokenAddress,
     amount, // uint256 _amount,
     {
@@ -91,27 +94,8 @@ async function main() {
       gasPrice: 20 * 1000000000
     }
   )
-  console.log('stop', stop.hash)
-  await stop.wait()
-
-
-  // /**
-  //  * WITHDRAW
-  //  */
-  // await printBalances();
-  // console.log('')
-  // console.log('Withdrawing')
-
-  // const withdrawResult = await mstableProvider.withdraw(
-  //   erc20Address, // address _tokenAddress,
-  //   amount, // uint256 _amount,
-  //   {
-  //     gasLimit: 1000000,
-  //     gasPrice: 20 * 1000000000
-  //   }
-  // )
-  // console.log('withdrawResult1', withdrawResult.hash)
-  // await withdrawResult.wait()
+  console.log('withdrawResult1', withdrawResult.hash)
+  await withdrawResult.wait()
 
 
   /**

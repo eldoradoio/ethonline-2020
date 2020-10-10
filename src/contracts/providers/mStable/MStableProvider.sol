@@ -82,20 +82,13 @@ contract MStableProvider
     }
 
 
-    function stop(
-        address _tokenAddress,
-        uint256 _amount
-    ) external returns(uint256){
-        uint256 creditUnits = _getSaveRedeemInput(_amount - 1);     
-        uint256 massetReturned = savings.redeem(creditUnits);
-        return massetReturned;
-    }
-
     function withdraw(
         address _tokenAddress,
         uint256 _amount
     ) external returns(uint256){
-        uint256 redeemed = masset.redeemTo(address(_tokenAddress), _amount, msg.sender);
+        uint256 creditUnits = _getSaveRedeemInput(_amount ) - 1;     
+        uint256 massetReturned = savings.redeem(creditUnits);
+        uint256 redeemed = masset.redeemTo(address(_tokenAddress), _amount - 1, msg.sender);
         return redeemed;
     }
 
