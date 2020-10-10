@@ -1,7 +1,8 @@
-usePlugin("@nomiclabs/buidler-waffle");
+const { config } = require('chai');
 
-// This is a sample Buidler task. To learn how to create your own go to
-// https://buidler.dev/guides/create-task.html
+usePlugin("@nomiclabs/buidler-waffle");
+require('dotenv').config();
+
 task("accounts", "Prints the list of accounts", async () => {
   const accounts = await ethers.getSigners();
 
@@ -10,13 +11,19 @@ task("accounts", "Prints the list of accounts", async () => {
   }
 });
 
-// You have to export an object to set up your config
-// This object can have the following optional entries:
-// defaultNetwork, networks, solc, and paths.
-// Go to https://buidler.dev/config/ to learn more
+const INFURA_PROJECT_ID = process.env.INFURA_PROJECT_ID;
+const ROPSTEN_PRIVATE_KEY = process.env.ROPSTEN_PRIVATE_KEY;
+
+
+
 module.exports = {
-  // This is a sample solc configuration that specifies which version of solc to use
   solc: {
     version: "0.5.16",
   },
+  networks: {
+    ropsten: {
+      url: `https://ropsten.infura.io/v3/${INFURA_PROJECT_ID}`,
+      accounts: [`0x${ROPSTEN_PRIVATE_KEY}`]
+    }
+  }
 };

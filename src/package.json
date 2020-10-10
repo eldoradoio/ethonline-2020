@@ -12,12 +12,14 @@
     "@nomiclabs/buidler-ethers": "^2.0.2",
     "@nomiclabs/buidler-waffle": "^2.1.0",
     "chai": "^4.2.0",
+    "dotenv": "^8.2.0",
     "ethereum-waffle": "^3.1.1",
     "ethers": "^5.0.16"
   },
   "scripts": {
     "start": "npx buidler compile",
-    "test": "npx buidler test"
+    "test": "npx buidler test",
+    "deploy:mstable": "buidler run scripts/deploy_MStableProvider.js --network ropsten"
   },
   "author": "",
   "license": "ISC"
