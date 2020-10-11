@@ -18,7 +18,7 @@ contract MStableProvider
     IERC20 private mUSD;
     IMStableHelper private helper;
 
-    uint256 private totalDepossited;
+    uint256 private totalDeposited;
 
     constructor(
             address _masset, 
@@ -29,7 +29,7 @@ contract MStableProvider
         savings = _savings;
         mUSD = IERC20(_masset);
         helper = _helper;
-        totalDepossited = 0;
+        totalDeposited = 0;
     }    
 
     function approveToken(uint256 _tokenAddress) external returns(bool){
@@ -58,7 +58,7 @@ contract MStableProvider
         token.transferFrom(msg.sender, address(this), _amount);
         // mint basset to get masset
         uint256 massetsMinted = masset.mintTo(_tokenAddress, _amount, address(this));
-        totalDepossited  += massetsMinted;
+        totalDeposited  += massetsMinted;
         // deposit masset
         savings.depositSavings(massetsMinted);
 
@@ -76,9 +76,9 @@ contract MStableProvider
 
     function earntOf() external view returns(uint256) {
         uint256 balance = helper.getSaveBalance(savings,address(this));
-        if(balance < totalDepossited)
+        if(balance <= totalDeposited)
             return 0;
-        return  balance - totalDepossited;
+        return  balance - totalDeposited;
     }
 
 
@@ -89,7 +89,7 @@ contract MStableProvider
         uint256 creditUnits = _getSaveRedeemInput(_amount ) - 1;     
         uint256 massetReturned = savings.redeem(creditUnits);
         uint256 redeemed = masset.redeemTo(address(_tokenAddress), _amount - 1, msg.sender);
-        totalDepossited  -= massetReturned;
+        totalDeposited  -= massetReturned;
         return redeemed;
     }
 
@@ -112,6 +112,10 @@ contract MStableProvider
 
     function suggestMintAsset() external view returns(bool, string memory, address){
         return helper.suggestMintAsset(address(masset));
+    }
+
+    function getTotalDeposited() external view returns(uint256) {
+        return totalDeposited;
     }
     // function creditBalances(address) external view returns (uint256);
 

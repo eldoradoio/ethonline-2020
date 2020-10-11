@@ -11,6 +11,12 @@ const erc20WithDecimalsAbi = [
   "function symbol() view returns (string)",
 ];
 
+function delay(seconds){
+  return new Promise(function(resolve){
+    setTimeout(resolve, (seconds || 1) * 1000)
+  })
+}
+
 async function main() {
 
   const fromExp = (bn, exp) => BigNumber.from(bn).mul(BigNumber.from(10).pow(exp))
@@ -28,12 +34,10 @@ async function main() {
   console.log("Account ETH balance:", ((await deployer.getBalance()).div('100000000000000').toNumber() / 10000).toFixed(4));
 
   const MStableProvider = await ethers.getContractFactory("MStableProvider");
-  const erc20Address =
-    //'0xB404c51BBC10dcBE948077F18a4B8E553D160084' //USDT-MS
-    '0xf80a32a835f79d7787e8a8ee5721d0feafd78108' //DAI-AAVE
 
-
+  const erc20Address = '0xB404c51BBC10dcBE948077F18a4B8E553D160084' //USDT-MS
   const MAssetAddress = "0x4E1000616990D83e56f4b5fC6CC8602DcfD20459" //MAsset
+
   const erc20Factory = await ethers.getContractFactory("ERC20");
   const erc20 = erc20Factory.attach(erc20Address)
   const erc20WithDecimals = new ethers.Contract(erc20Address, erc20WithDecimalsAbi, deployer);
@@ -44,7 +48,7 @@ async function main() {
   const mAsset = erc20Factory.attach(MAssetAddress)
 
   /**CONTRACT SETUP */
-  //console.log('Deploying...')
+  // console.log('Deploying...')
   // const mstableProvider = await MStableProvider.deploy(
   //   MAssetAddress, //MAsset, 
   //   "0x300e56938454A4d8005B2e84eefFca002B3a24Bc", //ISavingsContract
@@ -55,7 +59,7 @@ async function main() {
   //   }
   // );
 
-  const mstableProvider = MStableProvider.attach("0xF44A6da5799F5f641F8a221d2430Ec9966441e43")
+  const mstableProvider = MStableProvider.attach("0xC00dE55A60E08E828Db890d56bCc70e85E383B83")
 
   const mstableProviderAddress = mstableProvider.address;
 
@@ -74,21 +78,26 @@ async function main() {
     console.log('* User ERC20 balance', (await erc20.balanceOf(signerAddress)).toString())
     console.log('* Provider mStable balance', (await mAsset.balanceOf(mstableProviderAddress)).toString())
     console.log('* Exchange rate', (await mstableProvider.exchangeRate()).toString())
+    console.log('* Total Deposited', (await mstableProvider.getTotalDeposited()).toString())
+    
   }
 
   console.log('')
 
-  const amount = fromExp(10, erc20Digits)
+  //AMOUNT TO PLAY WITH
+  const amount = fromExp(50, erc20Digits)
   console.log('amount', amount.toString())
 
   const allowance = await erc20.allowance(signerAddress, mstableProviderAddress);
   console.log('allowance', allowance.toString())
   if (allowance.lt(amount)) {
-    console.log('Increasing allowance to', amount)
+    console.log('Increasing allowance to', amount.toString())
     const approved = await erc20.approve(mstableProviderAddress, amount, { gasPrice: gasPrice })
     console.log('Increased allowance hash', approved.hash)
     await approved.wait()
   }
+
+ 
 
   /*
   * DEPOSIT 
@@ -107,6 +116,13 @@ async function main() {
   await result.wait()
 
   console.log('getSaveRedeemInput', (await mstableProvider.getSaveRedeemInput(amount)).toString());
+
+
+  for (let i = 0; i < 60; i++) {
+    await delay();
+    await printBalances();
+  }
+
 
   /**
    * WITHDRAW
