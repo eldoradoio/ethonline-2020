@@ -105,18 +105,15 @@ contract MStableProvider
        return  _getSaveRedeemInput(_amount);
     }
 
-    /* TODO: with the helper, we can call this and maybe swap to get that one?
-    function suggestMintAsset(
-            address _mAsset
-        )
-            external
-            view
-            returns (
-                bool,
-                string memory,
-                address
-            );
+
+    function exchangeRate() external view returns (uint256){
+        return savings.exchangeRate();
+    }
+
+    function suggestMintAsset() external view returns(bool, string memory, address){
+        return helper.suggestMintAsset(address(masset));
+    }
+    // function creditBalances(address) external view returns (uint256);
 
 
-    */
 }

@@ -3,8 +3,20 @@
 // When running the script with `buidler run <script>` you'll find the Buidler
 // Runtime Environment's members available in the global scope.
 const bre = require("@nomiclabs/buidler");
+const { BigNumber } = require('@ethersproject/bignumber')
+const erc20WithDecimalsAbi = [
+  // Read-Only Functions
+  "function balanceOf(address owner) view returns (uint256)",
+  "function decimals() view returns (uint8)",
+  "function symbol() view returns (string)",
+];
 
 async function main() {
+
+  const fromExp = (bn, exp) => BigNumber.from(bn).mul(BigNumber.from(10).pow(exp))
+
+  const gasPrice = 100 * 1000000000;
+
   const [deployer] = await ethers.getSigners();
 
   const signerAddress = await deployer.getAddress();
@@ -13,32 +25,46 @@ async function main() {
     signerAddress
   );
 
-  console.log("Account ETH balance:", (await deployer.getBalance()).div('1000000000000000000').toString());
-
+  console.log("Account ETH balance:", ((await deployer.getBalance()).div('100000000000000').toNumber() / 10000).toFixed(4));
 
   const MStableProvider = await ethers.getContractFactory("MStableProvider");
-  const erc20Address = '0xB404c51BBC10dcBE948077F18a4B8E553D160084'
-  const MAssetAddress = "0x4E1000616990D83e56f4b5fC6CC8602DcfD20459" //MAsset
-  const erc20Factory = await ethers.getContractFactory("IERC20");
+  const erc20Address =
+    //'0xB404c51BBC10dcBE948077F18a4B8E553D160084' //USDT-MS
+    '0xf80a32a835f79d7787e8a8ee5721d0feafd78108' //DAI-AAVE
 
+
+  const MAssetAddress = "0x4E1000616990D83e56f4b5fC6CC8602DcfD20459" //MAsset
+  const erc20Factory = await ethers.getContractFactory("ERC20");
   const erc20 = erc20Factory.attach(erc20Address)
+  const erc20WithDecimals = new ethers.Contract(erc20Address, erc20WithDecimalsAbi, deployer);
+
+  const erc20Digits = await erc20WithDecimals.decimals() // OZ's IERC20 v2 does not support decimals (＃°Д°)
+  console.log('erc20Digits', erc20Digits)
+
   const mAsset = erc20Factory.attach(MAssetAddress)
 
   /**CONTRACT SETUP */
+  //console.log('Deploying...')
   // const mstableProvider = await MStableProvider.deploy(
   //   MAssetAddress, //MAsset, 
   //   "0x300e56938454A4d8005B2e84eefFca002B3a24Bc", //ISavingsContract
-  //   "0x1c0de4e659e76d3c876813ff2ba9dc2da07ab658" //Helper
+  //   "0x1c0de4e659e76d3c876813ff2ba9dc2da07ab658", //Helper
+  //   {
+  //     gasLimit: 1300000,
+  //     gasPrice: gasPrice
+  //   }
   // );
 
-  const mstableProvider = MStableProvider.attach("0x5EE9a1831F7E5c1629D0428809749061A617431f")
+  const mstableProvider = MStableProvider.attach("0xF44A6da5799F5f641F8a221d2430Ec9966441e43")
 
   const mstableProviderAddress = mstableProvider.address;
 
   await mstableProvider.deployed();
-  (await mstableProvider.approveToken(erc20Address)).wait();
+  (await mstableProvider.approveToken(erc20Address, { gasPrice: gasPrice })).wait();
 
   console.log("MStableProvider deployed to:", mstableProviderAddress);
+
+  console.log('suggestMintAsset', (await mstableProvider.suggestMintAsset()));
 
   /**SENDER SETUP */
 
@@ -47,28 +73,34 @@ async function main() {
     console.log('* Earnt balance', (await mstableProvider.earntOf()).toString());
     console.log('* User ERC20 balance', (await erc20.balanceOf(signerAddress)).toString())
     console.log('* Provider mStable balance', (await mAsset.balanceOf(mstableProviderAddress)).toString())
+    console.log('* Exchange rate', (await mstableProvider.exchangeRate()).toString())
   }
 
   console.log('')
+
+  const amount = fromExp(10, erc20Digits)
+  console.log('amount', amount.toString())
+
   const allowance = await erc20.allowance(signerAddress, mstableProviderAddress);
-  //console.log('allowance', allowance.toString())
-  const approved = await erc20.approve(mstableProviderAddress, '20000000')
-  await approved.wait()
-  //console.log('allowance', (await erc20.allowance(signerAddress, mstableProviderAddress)).toString())
+  console.log('allowance', allowance.toString())
+  if (allowance.lt(amount)) {
+    console.log('Increasing allowance to', amount)
+    const approved = await erc20.approve(mstableProviderAddress, amount, { gasPrice: gasPrice })
+    console.log('Increased allowance hash', approved.hash)
+    await approved.wait()
+  }
 
-  const amount = '2500000'
-
-  
   /*
   * DEPOSIT 
   */
   await printBalances();
+
   console.log('')
   console.log('Depositing')
- 
+
   const result = await mstableProvider.deposit(erc20Address, amount, {
     gasLimit: 1000000,
-    gasPrice: 20 * 1000000000
+    gasPrice: gasPrice
   })
 
   console.log('deposit hash', result.hash)
@@ -88,7 +120,7 @@ async function main() {
     amount, // uint256 _amount,
     {
       gasLimit: 1000000,
-      gasPrice: 20 * 1000000000
+      gasPrice: gasPrice
     }
   )
   console.log('withdrawResult1', withdrawResult.hash)
