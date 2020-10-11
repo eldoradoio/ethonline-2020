@@ -132,6 +132,7 @@ async function main() {
     const interestEarnt = await printBalances();
     if (interestEarnt.gt('0')) {
       console.log('Got some!', interestEarnt.toString())
+      break;
     }
     else {
       await delay(60);
