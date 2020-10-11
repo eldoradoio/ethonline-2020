@@ -58,7 +58,7 @@ contract MStableProvider
         token.transferFrom(msg.sender, address(this), _amount);
         // mint basset to get masset
         uint256 massetsMinted = masset.mintTo(_tokenAddress, _amount, address(this));
-        totalDepossited = totalDepossited + massetsMinted;
+        totalDepossited  += massetsMinted;
         // deposit masset
         savings.depositSavings(massetsMinted);
 
@@ -89,6 +89,7 @@ contract MStableProvider
         uint256 creditUnits = _getSaveRedeemInput(_amount ) - 1;     
         uint256 massetReturned = savings.redeem(creditUnits);
         uint256 redeemed = masset.redeemTo(address(_tokenAddress), _amount - 1, msg.sender);
+        totalDepossited  -= massetReturned;
         return redeemed;
     }
 

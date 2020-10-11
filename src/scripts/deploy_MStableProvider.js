@@ -9,7 +9,7 @@ async function main() {
 
   const signerAddress = await deployer.getAddress();
   console.log(
-    "Deploying contracts with the account:",
+    "Signer Address:",
     signerAddress
   );
 
@@ -57,27 +57,24 @@ async function main() {
   //console.log('allowance', (await erc20.allowance(signerAddress, mstableProviderAddress)).toString())
 
   const amount = '2500000'
-  await printBalances();
+
   
-  return;
-  // /*
-  // * DEPOSIT 
-  // */
-  // await printBalances();
-  // console.log('')
-  // console.log('Depositing')
+  /*
+  * DEPOSIT 
+  */
+  await printBalances();
+  console.log('')
+  console.log('Depositing')
  
-  // const result = await mstableProvider.deposit(erc20Address, amount, {
-  //   gasLimit: 1000000,
-  //   gasPrice: 20 * 1000000000
-  // })
+  const result = await mstableProvider.deposit(erc20Address, amount, {
+    gasLimit: 1000000,
+    gasPrice: 20 * 1000000000
+  })
 
-  // console.log('deposit hash', result.hash)
-  // await result.wait()
+  console.log('deposit hash', result.hash)
+  await result.wait()
 
-  // console.log('getSaveRedeemInput', (await mstableProvider.getSaveRedeemInput(amount)).toString());
-
- return;
+  console.log('getSaveRedeemInput', (await mstableProvider.getSaveRedeemInput(amount)).toString());
 
   /**
    * WITHDRAW
