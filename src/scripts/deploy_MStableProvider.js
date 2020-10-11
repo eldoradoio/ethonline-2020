@@ -11,8 +11,8 @@ const erc20WithDecimalsAbi = [
   "function symbol() view returns (string)",
 ];
 
-function delay(seconds){
-  return new Promise(function(resolve){
+function delay(seconds) {
+  return new Promise(function (resolve) {
     setTimeout(resolve, (seconds || 1) * 1000)
   })
 }
@@ -59,7 +59,7 @@ async function main() {
   //   }
   // );
 
-  const mstableProvider = MStableProvider.attach("0xC00dE55A60E08E828Db890d56bCc70e85E383B83")
+  const mstableProvider = MStableProvider.attach("0x70223c2F16336ddbE47a91C490100c0A5ba56704")
 
   const mstableProviderAddress = mstableProvider.address;
 
@@ -73,60 +73,74 @@ async function main() {
   /**SENDER SETUP */
 
   const printBalances = async () => {
-    console.log('* Savings balance', (await mstableProvider.balanceOf()).toString());
-    console.log('* Earnt balance', (await mstableProvider.earntOf()).toString());
-    console.log('* User ERC20 balance', (await erc20.balanceOf(signerAddress)).toString())
-    console.log('* Provider mStable balance', (await mAsset.balanceOf(mstableProviderAddress)).toString())
-    console.log('* Exchange rate', (await mstableProvider.exchangeRate()).toString())
-    console.log('* Total Deposited', (await mstableProvider.getTotalDeposited()).toString())
-    
+    const tasks = [
+      mstableProvider.balanceOf(),
+      mstableProvider.earntOf(),
+      erc20.balanceOf(signerAddress),
+      mAsset.balanceOf(mstableProviderAddress),
+      mstableProvider.exchangeRate(),
+      mstableProvider.getTotalDeposited()
+    ]
+    const [savings, earntOf, erc20Balance, mAssets, exchangeRate, getTotalDeposited] = await Promise.all(tasks)
+
+    //console.clear();
+    console.log('* Savings balance', savings.toString());
+    console.log('* Earnt balance', earntOf.toString());
+    console.log('* User ERC20 balance', erc20Balance.toString())
+    console.log('* Provider mStable balance', mAssets.toString())
+    console.log('* Exchange rate', exchangeRate.toString())
+    console.log('* Total Deposited', getTotalDeposited.toString())
+    return earntOf
   }
 
   console.log('')
-
-  //AMOUNT TO PLAY WITH
-  const amount = fromExp(50, erc20Digits)
-  console.log('amount', amount.toString())
-
-  const allowance = await erc20.allowance(signerAddress, mstableProviderAddress);
-  console.log('allowance', allowance.toString())
-  if (allowance.lt(amount)) {
-    console.log('Increasing allowance to', amount.toString())
-    const approved = await erc20.approve(mstableProviderAddress, amount, { gasPrice: gasPrice })
-    console.log('Increased allowance hash', approved.hash)
-    await approved.wait()
-  }
-
- 
 
   /*
-  * DEPOSIT 
+  * AMOUNT TO PLAY WITH
   */
-  await printBalances();
+  const ercBalance = await erc20.balanceOf(signerAddress)
+  const amount = ercBalance //fromExp(20000, erc20Digits)
+  console.log('amount', amount.toString())
 
-  console.log('')
-  console.log('Depositing')
+  if (amount > 0) {
+    const allowance = await erc20.allowance(signerAddress, mstableProviderAddress);
+    console.log('allowance', allowance.toString())
+    if (allowance.lt(amount)) {
+      console.log('Increasing allowance to', amount.toString())
+      const approved = await erc20.approve(mstableProviderAddress, amount, { gasPrice: gasPrice })
+      console.log('Increased allowance hash', approved.hash)
+      await approved.wait()
+    }
 
-  const result = await mstableProvider.deposit(erc20Address, amount, {
-    gasLimit: 1000000,
-    gasPrice: gasPrice
-  })
 
-  console.log('deposit hash', result.hash)
-  await result.wait()
+    /*
+    * DEPOSIT 
+    */
+    console.log(''); console.log('Depositing')
+    const result = await mstableProvider.deposit(erc20Address, amount, {
+      gasLimit: 1000000,
+      gasPrice: gasPrice
+    })
 
-  console.log('getSaveRedeemInput', (await mstableProvider.getSaveRedeemInput(amount)).toString());
-
+    console.log('deposit hash', result.hash)
+    await result.wait()
+    console.log('getSaveRedeemInput', (await mstableProvider.getSaveRedeemInput(amount)).toString());
+  }
 
   for (let i = 0; i < 60; i++) {
-    await delay();
-    await printBalances();
+    await delay(60);
+    console.log('')
+    const interestEarnt = await printBalances();
+    if(interestEarnt.gt('0')) {
+      console.log('Got some!', interestEarnt)
+    }
   }
 
 
   /**
    * WITHDRAW
    */
+  console.log('')
   await printBalances();
   console.log('')
   console.log('Withdrawing')

@@ -52,7 +52,7 @@ contract MStableProvider
         IERC20 token = IERC20(_tokenAddress);
 
         uint256 balance = token.balanceOf(msg.sender);
-        require(balance > _amount, "Insufficient balance");
+        require(_amount <= balance , "Insufficient balance");
 
         // Temp transfer bAsset to this contract
         token.transferFrom(msg.sender, address(this), _amount);
