@@ -59,7 +59,7 @@ async function main() {
   //   }
   // );
 
-  const mstableProvider = MStableProvider.attach("0x70223c2F16336ddbE47a91C490100c0A5ba56704")
+  const mstableProvider = MStableProvider.attach("0xC815377A55914256A307c080294f6f45ff684A55")
 
   const mstableProviderAddress = mstableProvider.address;
 
@@ -94,20 +94,23 @@ async function main() {
   }
 
   console.log('')
+  await printBalances();
+  console.log('')
 
   /*
   * AMOUNT TO PLAY WITH
   */
   const ercBalance = await erc20.balanceOf(signerAddress)
   const amount = ercBalance //fromExp(20000, erc20Digits)
-  console.log('amount', amount.toString())
+  console.log('Amount', amount.toString())
 
   if (amount > 0) {
     const allowance = await erc20.allowance(signerAddress, mstableProviderAddress);
     console.log('allowance', allowance.toString())
+    
     if (allowance.lt(amount)) {
       console.log('Increasing allowance to', amount.toString())
-      const approved = await erc20.approve(mstableProviderAddress, amount, { gasPrice: gasPrice })
+      const approved = await erc20.approve(mstableProviderAddress, amount.mul('10'), { gasPrice: gasPrice })
       console.log('Increased allowance hash', approved.hash)
       await approved.wait()
     }
@@ -124,7 +127,6 @@ async function main() {
 
     console.log('deposit hash', result.hash)
     await result.wait()
-    console.log('getSaveRedeemInput', (await mstableProvider.getSaveRedeemInput(amount)).toString());
   }
 
   for (let i = 0; i < 60; i++) {
@@ -146,9 +148,10 @@ async function main() {
   console.log('')
   await printBalances();
   console.log('')
-  const withdrawAmount = await mstableProvider.getTotalDeposited()
+  const withdrawAmount = await mstableProvider.balanceOf()
   console.log('Withdrawing', withdrawAmount.toString())
  
+  // this is design to take the same amount of digits, and totaldeposited is in mstable
   const withdrawResult = await mstableProvider.withdraw(
     erc20Address, // address _tokenAddress,
     withdrawAmount, // uint256 _amount,

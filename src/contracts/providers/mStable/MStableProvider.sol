@@ -84,9 +84,12 @@ contract MStableProvider
 
     function withdraw(
         address _tokenAddress,
-        uint256 _amount
+        uint256 _amount //This is in mstable with lots of digits xC
     ) external returns(uint256){
-        uint256 creditUnits = _getSaveRedeemInput(_amount ) - 1;     
+        uint256 creditUnits =  helper.getSaveRedeemInput(
+            savings,
+            _amount
+        ) - 1;     
         uint256 massetReturned = savings.redeem(creditUnits);
         uint256 redeemed = masset.redeemTo(address(_tokenAddress), _amount - 1, msg.sender);
         totalDeposited  -= massetReturned;
@@ -94,16 +97,7 @@ contract MStableProvider
     }
 
 
-    function _getSaveRedeemInput(uint256 _amount) internal view returns(uint256){
-       return  helper.getSaveRedeemInput(
-            savings,
-            _amount * 1000000000000  //TODO Diff from token and mstable digits????
-        );
-    }
 
-    function getSaveRedeemInput(uint256 _amount) external view returns(uint256){
-       return  _getSaveRedeemInput(_amount);
-    }
 
 
     function exchangeRate() external view returns (uint256){
