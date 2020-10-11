@@ -128,11 +128,13 @@ async function main() {
   }
 
   for (let i = 0; i < 60; i++) {
-    await delay(60);
     console.log('')
     const interestEarnt = await printBalances();
-    if(interestEarnt.gt('0')) {
+    if (interestEarnt.gt('0')) {
       console.log('Got some!', interestEarnt)
+    }
+    else {
+      await delay(60);
     }
   }
 
