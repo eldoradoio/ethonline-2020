@@ -128,10 +128,10 @@ async function main() {
   }
 
   for (let i = 0; i < 60; i++) {
-    console.log('')
+    console.log('Pass', i)
     const interestEarnt = await printBalances();
     if (interestEarnt.gt('0')) {
-      console.log('Got some!', interestEarnt)
+      console.log('Got some!', interestEarnt.toString())
     }
     else {
       await delay(60);
@@ -145,11 +145,12 @@ async function main() {
   console.log('')
   await printBalances();
   console.log('')
-  console.log('Withdrawing')
-
+  const withdrawAmount = await mstableProvider.getTotalDeposited()
+  console.log('Withdrawing', withdrawAmount.toString())
+ 
   const withdrawResult = await mstableProvider.withdraw(
     erc20Address, // address _tokenAddress,
-    amount, // uint256 _amount,
+    withdrawAmount, // uint256 _amount,
     {
       gasLimit: 1000000,
       gasPrice: gasPrice
