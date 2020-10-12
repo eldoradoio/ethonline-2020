@@ -144,9 +144,8 @@ async function main() {
     if (interestEarnt.gt('0')) {
       console.log('Got some!', interestEarnt.toString())
     }
-    else {
-      await delay(60);
-    }
+
+    await delay(60);
   }
 
 
@@ -154,14 +153,14 @@ async function main() {
    * WITHDRAW
    */
 
-  
+
   if (false) {
     // If we have (for any reason mstable in the contract, we need to split the process)
     const redeemAmount = await mstableProvider.balanceOf()
     console.log('')
     await printBalances();
     console.log('')
-    
+
     console.log('redeemAmount', redeemAmount.toString())
     if (redeemAmount.gt('0')) {
       console.log('Redeeming deposit to mstable')
