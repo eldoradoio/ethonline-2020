@@ -9,6 +9,9 @@ import "../../IElDoradoSavingsProvider.sol";
 
 import "@nomiclabs/buidler/console.sol";
 
+//NOTE APY = ((amount now * 1e18 / amount then) - 1e18) * (secondsInYear / depositLengthInSeconds)
+
+
 contract MStableProvider 
     /*is IElDoradoSavingsProvider*/
      {
@@ -82,20 +85,51 @@ contract MStableProvider
     }
 
 
+    // Redeem + Swap back to basset
     function withdraw(
         address _tokenAddress,
         uint256 _amount //This is in mstable with lots of digits xC
     ) external returns(uint256){
-        uint256 creditUnits =  helper.getSaveRedeemInput(
-            savings,
-            _amount
-        ) - 1;     
+        require(_amount > 0, "Must withdraw something");
+        uint256 creditUnits =  helper.getSaveRedeemInput(savings, _amount);     
         uint256 massetReturned = savings.redeem(creditUnits);
-        uint256 redeemed = masset.redeemTo(address(_tokenAddress), _amount - 1, msg.sender);
+
+        bool valid;
+        string memory reason;
+        uint256 bassetUnits;
+        uint256 bassetQuantityArg;
+
+        (valid, reason, bassetUnits,bassetQuantityArg) = helper.getRedeemValidity(address(masset), massetReturned, _tokenAddress);
+        uint256 redeemed = masset.redeemTo(address(_tokenAddress), bassetQuantityArg, msg.sender);
+        
         totalDeposited  -= massetReturned;
         return redeemed;
     }
 
+
+
+
+    
+
+    // AUXILIARY METHODS
+
+    // From deposit to mAsset
+    function redeemDeposit(uint256 _amount) external returns (uint256){
+        require(_amount > 0, "Must redeem something");
+        uint256 creditUnits =  helper.getSaveRedeemInput(
+            savings,
+            _amount
+        );
+        return savings.redeem(creditUnits);
+    }
+
+    //from M
+    function redeemAssets( address _tokenAddress, uint256 _amount) external returns (uint256){
+        require(_amount > 0, "Must redeem something");
+        uint256 redeemed = masset.redeemTo(address(_tokenAddress), _amount, msg.sender);
+        totalDeposited  -= _amount;
+        return redeemed;
+    }
 
 
 
