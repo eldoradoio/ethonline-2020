@@ -67,7 +67,7 @@ async function main() {
   //   }
   // );
 
-  //const mstableProvider = MStableProvider.attach("0x00dd7206034D602E6135E1e9376919bE63841e0c")
+  const mstableProvider = MStableProvider.attach("0x00dd7206034D602E6135E1e9376919bE63841e0c")
 
   const mstableProviderAddress = mstableProvider.address;
 
@@ -138,7 +138,7 @@ async function main() {
     await result.wait()
   }
 
-  for (let i = 0; i < 1; i++) {
+  for (let i = 0; i < 60; i++) {
     console.log('Pass', i)
     const interestEarnt = await printBalances();
     if (interestEarnt.gt('0')) {
@@ -146,7 +146,7 @@ async function main() {
       break;
     }
     else {
-      await delay();
+      await delay(60);
     }
   }
 
