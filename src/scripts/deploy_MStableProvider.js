@@ -83,8 +83,8 @@ async function main() {
 
   const printBalances = async () => {
     const tasks = [
-      mstableProvider.balanceOf(),
-      mstableProvider.earntOf(),
+      mstableProvider.getBalance(),
+      mstableProvider.getEarnings(),
       erc20.balanceOf(signerAddress),
       mAsset.balanceOf(mstableProviderAddress),
       mstableProvider.exchangeRate(),
@@ -138,14 +138,14 @@ async function main() {
     await result.wait()
   }
 
-  for (let i = 0; i < 60; i++) {
+  for (let i = 0; i < 1; i++) {
     console.log('Pass', i)
     const interestEarnt = await printBalances();
     if (interestEarnt.gt('0')) {
       console.log('Got some!', interestEarnt.toString())
     }
 
-    await delay(60);
+    await delay();
   }
 
 
@@ -156,7 +156,7 @@ async function main() {
 
   if (false) {
     // If we have (for any reason mstable in the contract, we need to split the process)
-    const redeemAmount = await mstableProvider.balanceOf()
+    const redeemAmount = await mstableProvider.getBalance()
     console.log('')
     await printBalances();
     console.log('')
@@ -178,7 +178,7 @@ async function main() {
     await redeemAssetsResult.wait()
   }
   else {
-    const withdrawAmount = await mstableProvider.balanceOf()
+    const withdrawAmount = await mstableProvider.getBalance()
     console.log('Withdrawing', withdrawAmount.toString())
 
 

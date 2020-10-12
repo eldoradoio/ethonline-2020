@@ -13,7 +13,8 @@ contract ElDoradoSavingAccounts is Ownable {
 
   using EnumerableSet for EnumerableSet.AddressSet;
   //using EnumerableMap for EnumerableMap.UintToAddressMap;
-
+  
+  mapping (address => address) private _token_provider;
   EnumerableSet.AddressSet private _providers;
 
   //cos mstable is not on >=0.6
@@ -29,23 +30,26 @@ contract ElDoradoSavingAccounts is Ownable {
     return _providers.length();
   }
 
-  function getProvider(uint256 index) public view returns (address) {
+  function getProviderByIndex(uint256 index) public view returns (address) {
 
     return _providers 
-        //.at // Change this to at when  migrating to 0.6
-        .get
+        .get //.at // Change this to at when  migrating to 0.6
         (index);
   }
 
-  function addProvider(address providerAddress) public {
+  function addProvider(address providerAddress, address _tokenAddress) public {
     // TODO: check if valid provider
-    console.log("Adding provider at");
+    _token_provider[_tokenAddress] = providerAddress;
     _providers.add(providerAddress);  
   }
 
 
-  function deposit(uint256 providerIndex, uint256 amount ) public {
-      IElDoradoSavingsProvider(getProvider(providerIndex)).deposit();
+  function depositOn(uint256 _providerIndex, address _tokenAddress, uint256 _amount) public {
+      IElDoradoSavingsProvider(getProviderByIndex(_providerIndex)).deposit(_tokenAddress, _amount);
+  }
+
+  function depositAt(address _tokenAddress, uint256 _amount) public {
+      IElDoradoSavingsProvider(_token_provider[_tokenAddress]).deposit(_tokenAddress, _amount);
   }
 
 

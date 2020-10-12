@@ -70,14 +70,14 @@ contract MStableProvider
         return massetsMinted;
     }
 
-    function balanceOf() external view returns(uint256) {
+    function getBalance() external view returns(uint256) {
        return helper.getSaveBalance(
             savings,
             address(this)
         );
     }
 
-    function earntOf() external view returns(uint256) {
+    function getEarnings() external view returns(uint256) {
         uint256 balance = helper.getSaveBalance(savings,address(this));
         if(balance <= totalDeposited)
             return 0;
