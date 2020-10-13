@@ -3,23 +3,41 @@ pragma solidity >=0.5.15;
 
 // We use this reference so buidler adds the artifact for us to use in the tests
 import "@openzeppelin/contracts/token/ERC20/ERC20Mintable.sol";
+import "@openzeppelin/contracts/utils/EnumerableSet.sol";
+
 import "../../IElDoradoSavingsProvider.sol";
 
 import "@nomiclabs/buidler/console.sol";
 
 contract MockProvider is IElDoradoSavingsProvider {
-    function deposit(address _tokenAddress, uint256 _amount) external view returns(uint256){
+
+    using EnumerableSet for EnumerableSet.AddressSet;
+
+    mapping (address => uint256)  private _balances;
+    EnumerableSet.AddressSet private _accountHolders;
+
+    function deposit(address account, address _tokenAddress, uint256 _amount) external returns(uint256){
         require(address(_tokenAddress) != address(0), "Invalid address");
+        _accountHolders.add(account);
+        _balances[account] += _amount;
         return _amount;
     }
-    function withdraw(address _tokenAddress, uint256 _amount) external returns(uint256){
+    function withdraw(address account, address _tokenAddress, uint256 _amount) external returns(uint256){
         require(address(_tokenAddress) != address(0), "Invalid address");
+        _balances[account] -= _amount;
         return _amount;
     }
-    function getBalance() external view returns(uint256){
-        return 0;
+    function getBalance(address account) external view returns(uint256){
+        return _balances[account];
     }
-    function getEarnings() external view returns(uint256){
+    function getEarnings(address account) external view returns(uint256){
+        return _balances[account];
+    }
+
+    function simulate() external returns (uint256) {
+        for(uint256 i=0; i< _accountHolders.length(); i++){
+             _balances[_accountHolders.get(i)] += 1;
+        }
         return 0;
     }
 }

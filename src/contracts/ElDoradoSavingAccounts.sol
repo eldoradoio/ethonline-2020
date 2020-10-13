@@ -64,14 +64,17 @@ contract ElDoradoSavingAccounts is Ownable {
   
 
   function getEarnings() external view returns(uint256){
-      //msg.sender
-      return _balances[msg.sender];
+    uint256 total = 0;
+    for(uint256 i=0; i< _providers.length(); i++){
+        total += IElDoradoSavingsProvider(_providers.get(i)).getEarnings(msg.sender);
+    }
+    return total;
   }
 
   function _deposit(address sender, address providerAddress, address _tokenAddress, uint256 _amount) private returns(uint256){
     // TODO: Check if valid provider
     // TODO: Check if valid erc20 token
-      uint256 result = IElDoradoSavingsProvider(providerAddress).deposit(_tokenAddress, _amount);
+      uint256 result = IElDoradoSavingsProvider(providerAddress).deposit(sender, _tokenAddress, _amount);
       _balances[sender] += result;
       return 0;
   }
