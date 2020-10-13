@@ -79,7 +79,7 @@ contract MStableProvider {
     function getBalance(address account) public view returns (uint256) {
         // Notes from mStable person:
         // The amount of mUSD this user owns at any point in time can then be calculated as creditsIssued * exchangeRate / 1e18;
-        return creditBalances[account] * savings.exchangeRate() * 1e18;
+        return creditBalances[account] * savings.exchangeRate() / 1e18;
     }
 
     function getTotalBalances(address account) external view returns (uint256) {
@@ -136,29 +136,29 @@ contract MStableProvider {
         return redeemed;
     }
 
-    // AUXILIARY METHODS
+    // // AUXILIARY METHODS
 
-    // From deposit to mAsset
-    function redeemDeposit(uint256 _amount) external returns (uint256) {
-        require(_amount > 0, "Must redeem something");
-        uint256 creditUnits = helper.getSaveRedeemInput(savings, _amount);
-        return savings.redeem(creditUnits);
-    }
+    // // From deposit to mAsset
+    // function redeemDeposit(uint256 _amount) external returns (uint256) {
+    //     require(_amount > 0, "Must redeem something");
+    //     uint256 creditUnits = helper.getSaveRedeemInput(savings, _amount);
+    //     return savings.redeem(creditUnits);
+    // }
 
-    //from M
-    function redeemAssets(address _tokenAddress, uint256 _amount)
-        external
-        returns (uint256)
-    {
-        require(_amount > 0, "Must redeem something");
-        uint256 redeemed = masset.redeemTo(
-            address(_tokenAddress),
-            _amount,
-            msg.sender
-        );
-        totalDeposited -= _amount;
-        return redeemed;
-    }
+    // //from M
+    // function redeemAssets(address _tokenAddress, uint256 _amount)
+    //     external
+    //     returns (uint256)
+    // {
+    //     require(_amount > 0, "Must redeem something");
+    //     uint256 redeemed = masset.redeemTo(
+    //         address(_tokenAddress),
+    //         _amount,
+    //         msg.sender
+    //     );
+    //     totalDeposited -= _amount;
+    //     return redeemed;
+    // }
 
     function exchangeRate() external view returns (uint256) {
         return savings.exchangeRate();

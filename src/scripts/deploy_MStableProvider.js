@@ -18,6 +18,7 @@ function delay(seconds) {
 }
 
 async function main() {
+  // TODO: make this test with multiple users/accounts
 
   const fromExp = (bn, from, to) => {
     if (from > to)
@@ -57,17 +58,17 @@ async function main() {
   /*
   * CONTRACT SETUP
   */
-  // console.log('Deploying...')
-  // const mstableProvider = await MStableProvider.deploy(
-  //   MAssetAddress, //MAsset, 
-  //   "0x300e56938454A4d8005B2e84eefFca002B3a24Bc", //ISavingsContract
-  //   "0x1c0de4e659e76d3c876813ff2ba9dc2da07ab658", //Helper
-  //   {
-  //     gasPrice: gasPrice
-  //   }
-  // );
+  console.log('Deploying...')
+  const mstableProvider = await MStableProvider.deploy(
+    MAssetAddress, //MAsset, 
+    "0x300e56938454A4d8005B2e84eefFca002B3a24Bc", //ISavingsContract
+    "0x1c0de4e659e76d3c876813ff2ba9dc2da07ab658", //Helper
+    {
+      gasPrice: gasPrice
+    }
+  );
 
-  const mstableProvider = MStableProvider.attach("0x00dd7206034D602E6135E1e9376919bE63841e0c")
+  //const mstableProvider = MStableProvider.attach("0x83E286Ce4C577C421a19fb078FDC9EA29415Ef68")
 
   const mstableProviderAddress = mstableProvider.address;
 
@@ -83,8 +84,8 @@ async function main() {
 
   const printBalances = async () => {
     const tasks = [
-      mstableProvider.getBalance(),
-      mstableProvider.getEarnings(),
+      mstableProvider.getBalance(signerAddress),
+      mstableProvider.getEarnings(signerAddress),
       erc20.balanceOf(signerAddress),
       mAsset.balanceOf(mstableProviderAddress),
       mstableProvider.exchangeRate(),
@@ -105,6 +106,7 @@ async function main() {
   console.log('')
   await printBalances();
   console.log('')
+
 
   /*
   * AMOUNT TO PLAY WITH
@@ -129,7 +131,7 @@ async function main() {
     * DEPOSIT 
     */
     console.log(''); console.log('Depositing')
-    const result = await mstableProvider.deposit(erc20Address, amount, {
+    const result = await mstableProvider.deposit(signerAddress, erc20Address, amount, {
       gasLimit: 1000000,
       gasPrice: gasPrice
     })
@@ -155,35 +157,36 @@ async function main() {
 
 
   if (false) {
-    // If we have (for any reason mstable in the contract, we need to split the process)
-    const redeemAmount = await mstableProvider.getBalance()
-    console.log('')
-    await printBalances();
-    console.log('')
+    // // If we have (for any reason mstable in the contract, we need to split the process)
+    // const redeemAmount = await mstableProvider.getBalance()
+    // console.log('')
+    // await printBalances();
+    // console.log('')
 
-    console.log('redeemAmount', redeemAmount.toString())
-    if (redeemAmount.gt('0')) {
-      console.log('Redeeming deposit to mstable')
-      const redeemResult = await mstableProvider.redeemDeposit(redeemAmount, { gasPrice: gasPrice, gasLimit: 250000 })
-      console.log(redeemResult.value.toString())
-      await redeemResult.wait()
-    }
+    // console.log('redeemAmount', redeemAmount.toString())
+    // if (redeemAmount.gt('0')) {
+    //   console.log('Redeeming deposit to mstable')
+    //   const redeemResult = await mstableProvider.redeemDeposit(redeemAmount, { gasPrice: gasPrice, gasLimit: 250000 })
+    //   console.log(redeemResult.value.toString())
+    //   await redeemResult.wait()
+    // }
 
-    // 19999679999999999999998
-    const amountToBurn = fromExp(await mAsset.balanceOf(mstableProviderAddress), 18, 6)
-    console.log('Burning mstable to get baset', amountToBurn.toString())
+    // // 19999679999999999999998
+    // const amountToBurn = fromExp(await mAsset.balanceOf(mstableProviderAddress), 18, 6)
+    // console.log('Burning mstable to get baset', amountToBurn.toString())
 
-    const redeemAssetsResult = await mstableProvider.redeemAssets(erc20Address, amountToBurn, { gasPrice: gasPrice, gasLimit: 500000 })
-    console.log(redeemAssetsResult.value.toString())
-    await redeemAssetsResult.wait()
+    // const redeemAssetsResult = await mstableProvider.redeemAssets(erc20Address, amountToBurn, { gasPrice: gasPrice, gasLimit: 500000 })
+    // console.log(redeemAssetsResult.value.toString())
+    // await redeemAssetsResult.wait()
   }
   else {
-    const withdrawAmount = await mstableProvider.getBalance()
+    const withdrawAmount = await mstableProvider.getBalance(signerAddress)
     console.log('Withdrawing', withdrawAmount.toString())
 
 
     // this is design to take the same amount of digits, and totaldeposited is in mstable
     const withdrawResult = await mstableProvider.withdraw(
+      signerAddress,
       erc20Address, // address _tokenAddress,
       withdrawAmount, // uint256 _amount,
       {
