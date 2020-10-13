@@ -4,6 +4,7 @@ pragma solidity >=0.5.15;
 import "@nomiclabs/buidler/console.sol";
 
 import "@openzeppelin/contracts/ownership/Ownable.sol";
+
 import "@openzeppelin/contracts/utils/EnumerableSet.sol";
 //import "@openzeppelin/contracts/utils/EnumerableMap.sol";
 
@@ -14,11 +15,10 @@ contract ElDoradoSavingAccounts is Ownable {
   using EnumerableSet for EnumerableSet.AddressSet;
   //using EnumerableMap for EnumerableMap.UintToAddressMap;
   
-  mapping (address => address) private _token_provider;
   EnumerableSet.AddressSet private _providers;
-
-  //cos mstable is not on >=0.6
-  //EnumerableMap.UintToAddressMap private _accounts;
+  mapping (address => address) private _token_provider;
+  mapping (address => uint256)  private _balances;
+  mapping (address => address)  private _accounts_providers;
 
   constructor() Ownable() public {
     console.log("Deploying ElDoradoSavingsAccounts Contract");
@@ -31,26 +31,50 @@ contract ElDoradoSavingAccounts is Ownable {
   }
 
   function getProviderByIndex(uint256 index) public view returns (address) {
-
-    return _providers 
-        .get //.at // Change this to at when  migrating to 0.6
-        (index);
+    return _providers.get(index);
   }
 
   function addProvider(address providerAddress, address _tokenAddress) public {
-    // TODO: check if valid provider
+    // TODO: Check if valid provider
+    // TODO: Check if valid erc20 token
     _token_provider[_tokenAddress] = providerAddress;
-    _providers.add(providerAddress);  
+    _providers.add(providerAddress); 
   }
 
 
-  function depositOn(uint256 _providerIndex, address _tokenAddress, uint256 _amount) public {
-      IElDoradoSavingsProvider(getProviderByIndex(_providerIndex)).deposit(_tokenAddress, _amount);
+  function depositOn(uint256 _providerIndex, address _tokenAddress, uint256 _amount) public returns(uint256) {
+      return _deposit(msg.sender, getProviderByIndex(_providerIndex), _tokenAddress, _amount);
   }
 
-  function depositAt(address _tokenAddress, uint256 _amount) public {
-      IElDoradoSavingsProvider(_token_provider[_tokenAddress]).deposit(_tokenAddress, _amount);
+  function depositAt(address _tokenAddress, uint256 _amount) public returns(uint256) {
+      return _deposit(msg.sender, _token_provider[_tokenAddress], _tokenAddress, _amount);
   }
 
+  function getBalance() external view returns(uint256){
+     return _balanceOf(msg.sender);
+  }
 
+  function balanceOf(address account) external view returns(uint256) {
+    return _balanceOf(account);
+  } 
+
+  function _balanceOf(address account) private view returns(uint256) {
+    return _balances[msg.sender];
+  } 
+  
+
+  function getEarnings() external view returns(uint256){
+      //msg.sender
+      return _balances[msg.sender];
+  }
+
+  function _deposit(address sender, address providerAddress, address _tokenAddress, uint256 _amount) private returns(uint256){
+    // TODO: Check if valid provider
+    // TODO: Check if valid erc20 token
+      uint256 result = IElDoradoSavingsProvider(providerAddress).deposit(_tokenAddress, _amount);
+      _balances[sender] += result;
+      return 0;
+  }
+
+  
 }

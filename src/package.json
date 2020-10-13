@@ -17,6 +17,7 @@
     "ethers": "^5.0.16"
   },
   "scripts": {
+    "clean": "npx buidler clean",
     "start": "npx buidler compile",
     "test": "npx buidler test",
     "deploy:mstable": "buidler run scripts/deploy_MStableProvider.js --network ropsten"

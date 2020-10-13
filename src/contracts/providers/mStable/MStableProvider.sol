@@ -10,7 +10,9 @@ import "../../IElDoradoSavingsProvider.sol";
 import "@nomiclabs/buidler/console.sol";
 
 //NOTE APY = ((amount now * 1e18 / amount then) - 1e18) * (secondsInYear / depositLengthInSeconds)
-
+//NOTE2: you would need to store the number of creditsIssued for the user after calling depositSavings. 
+//The amount of mUSD this user owns at any point in time can then be calculated as creditsIssued * exchangeRate / 1e18;
+//Then you could also call redeem(creditsIssued) and it would withdraw their balance 
 
 contract MStableProvider 
     /*is IElDoradoSavingsProvider*/
