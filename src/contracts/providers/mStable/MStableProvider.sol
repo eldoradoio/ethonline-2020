@@ -42,6 +42,7 @@ contract MStableProvider {
         token.approve(address(masset), uint256(-1));
         token.approve(address(savings), uint256(-1));
         mUSD.approve(address(savings), uint256(-1));
+        return true;
     }
 
     function deposit(
@@ -55,11 +56,11 @@ contract MStableProvider {
 
         IERC20 token = IERC20(_tokenAddress);
 
-        uint256 balance = token.balanceOf(msg.sender);
+        uint256 balance = token.balanceOf(account);
         require(_amount <= balance, "Insufficient balance");
 
         // Temp transfer bAsset to this contract
-        token.transferFrom(msg.sender, address(this), _amount);
+        token.transferFrom(account, address(this), _amount);
         // mint basset to get masset
 
         uint256 massetsMinted = masset.mintTo(
@@ -125,7 +126,7 @@ contract MStableProvider {
         uint256 redeemed = masset.redeemTo(
             address(_tokenAddress),
             bassetQuantityArg,
-            msg.sender
+            account
         );
 
         // Recalcualte creditBalances

@@ -32,12 +32,8 @@ async function main() {
   const gasPrice = 100 * 1000000000;
 
   const [deployer] = await ethers.getSigners();
-
   const signerAddress = await deployer.getAddress();
-  console.log(
-    "Signer Address:",
-    signerAddress
-  );
+  console.log("Signer Address:", signerAddress);
 
   console.log("Account ETH balance:", ((await deployer.getBalance()).div('100000000000000').toNumber() / 10000).toFixed(4));
 

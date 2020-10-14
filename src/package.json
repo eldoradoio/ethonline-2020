@@ -20,7 +20,8 @@
     "clean": "npx buidler clean",
     "start": "npx buidler compile",
     "test": "npx buidler test",
-    "deploy:mstable": "buidler run scripts/deploy_MStableProvider.js --network ropsten"
+    "deploy:mstable": "buidler run scripts/deploy_MStableProvider.js --network ropsten",
+    "deploy:all": "buidler run scripts/deploy_ElDoradoSavingAccounts.js --network ropsten"
   },
   "author": "",
   "license": "ISC"

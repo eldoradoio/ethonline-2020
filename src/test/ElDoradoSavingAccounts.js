@@ -12,7 +12,6 @@ describe("ElDoradoSavingAccounts", function () {
     const savingAccounts = await getNewInstanceOf("ElDoradoSavingAccounts")
     const mockProvider = await getNewInstanceOf("MockProvider")
     const erc20 = await getNewInstanceOf("ERC20Mintable")
-
     expect(await savingAccounts.providersCount()).to.equal(0);
 
     await savingAccounts.addProvider(mockProvider.address, erc20.address);

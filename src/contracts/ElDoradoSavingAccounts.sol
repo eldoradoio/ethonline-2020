@@ -10,7 +10,9 @@ import "@openzeppelin/contracts/utils/EnumerableSet.sol";
 
 import "./IElDoradoSavingsProvider.sol";
 
-contract ElDoradoSavingAccounts is Ownable {
+contract ElDoradoSavingAccounts 
+  //is Ownable 
+  {
 
   using EnumerableSet for EnumerableSet.AddressSet;
   //using EnumerableMap for EnumerableMap.UintToAddressMap;
@@ -20,7 +22,7 @@ contract ElDoradoSavingAccounts is Ownable {
   mapping (address => uint256)  private _balances;
   mapping (address => address)  private _accounts_providers;
 
-  constructor() Ownable() public {
+  constructor() /*Ownable()*/ public {
     console.log("Deploying ElDoradoSavingsAccounts Contract");
   }
 
@@ -35,8 +37,9 @@ contract ElDoradoSavingAccounts is Ownable {
   }
 
   function addProvider(address providerAddress, address _tokenAddress) public {
-    // TODO: Check if valid provider
-    // TODO: Check if valid erc20 token
+    // Callback for providers to implement internal erc20 approvals.
+    IElDoradoSavingsProvider(providerAddress).approveToken(_tokenAddress);
+    
     _token_provider[_tokenAddress] = providerAddress;
     _providers.add(providerAddress); 
   }
@@ -74,8 +77,10 @@ contract ElDoradoSavingAccounts is Ownable {
   function _deposit(address sender, address providerAddress, address _tokenAddress, uint256 _amount) private returns(uint256){
     // TODO: Check if valid provider
     // TODO: Check if valid erc20 token
-      uint256 result = IElDoradoSavingsProvider(providerAddress).deposit(sender, _tokenAddress, _amount);
-      _balances[sender] += result;
+      IElDoradoSavingsProvider(_providers.get(0)).getTotalDeposited();
+      //uint256 result = IElDoradoSavingsProvider(providerAddress).deposit(sender, _tokenAddress, _amount);
+      //_balances[sender] += result;
+      //return result;
       return 0;
   }
 
