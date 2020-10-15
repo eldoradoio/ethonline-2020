@@ -39,18 +39,22 @@ contract ElDoradoSavingAccounts
   function addProvider(address providerAddress, address _tokenAddress) public {
     // Callback for providers to implement internal erc20 approvals.
     IElDoradoSavingsProvider(providerAddress).approveToken(_tokenAddress);
-    
+    // TODO: Check for double entries
     _token_provider[_tokenAddress] = providerAddress;
     _providers.add(providerAddress); 
   }
 
 
-  function depositOn(uint256 _providerIndex, address _tokenAddress, uint256 _amount) public returns(uint256) {
+  function depositAt(uint256 _providerIndex, address _tokenAddress, uint256 _amount) external returns(uint256) {
       return _deposit(msg.sender, getProviderByIndex(_providerIndex), _tokenAddress, _amount);
   }
 
-  function depositAt(address _tokenAddress, uint256 _amount) public returns(uint256) {
+  function depositOn(address _tokenAddress, uint256 _amount) external returns(uint256) {
       return _deposit(msg.sender, _token_provider[_tokenAddress], _tokenAddress, _amount);
+  }
+
+  function withdrawOn(address _tokenAddress, uint256 _amount) external returns(uint256)  {
+    return _withdraw(msg.sender, _token_provider[_tokenAddress], _tokenAddress,_amount);
   }
 
   function getBalance() external view returns(uint256){
@@ -74,11 +78,17 @@ contract ElDoradoSavingAccounts
     return total;
   }
 
-  function _deposit(address sender, address providerAddress, address _tokenAddress, uint256 _amount) private returns(uint256){
+  function _deposit(address account, address _providerAddress, address _tokenAddress, uint256 _amount) private returns(uint256){
     // TODO: Check if valid provider
     // TODO: Check if valid erc20 token
-      uint256 result = IElDoradoSavingsProvider(providerAddress).deposit(sender, _tokenAddress, _amount);
-      _balances[sender] += result;
+      uint256 result = IElDoradoSavingsProvider(_providerAddress).deposit(account, _tokenAddress, _amount);
+      _balances[account] += result;
       return result;
   }  
+
+  function _withdraw(address account, address _providerAddress, address _tokenAddress, uint256 _amount) private returns(uint256) {
+      uint256 result = IElDoradoSavingsProvider(_providerAddress).withdraw(account, _tokenAddress, _amount);
+       _balances[account] -= result;
+      return result;
+  }
 }

@@ -35,15 +35,16 @@ async function main() {
     console.log('savingAccounts', savingAccounts.address)
 
 
-    const mstableProvider = await MStableProvider.deploy(
-        MAssetAddress, //MAsset, 
-        "0x300e56938454A4d8005B2e84eefFca002B3a24Bc", //ISavingsContract
-        "0x1c0de4e659e76d3c876813ff2ba9dc2da07ab658", //Helper
-        {
-            gasPrice: gasPrice
-        }
-    )    
-    await mstableProvider.deployed()
+    const mstableProvider = await MStableProvider.attach('0xEb14a277074Ed0b32BFA9132046c6F854Dda33B8')
+    // const mstableProvider = await MStableProvider.deploy(
+    //     MAssetAddress, //MAsset, 
+    //     "0x300e56938454A4d8005B2e84eefFca002B3a24Bc", //ISavingsContract
+    //     "0x1c0de4e659e76d3c876813ff2ba9dc2da07ab658", //Helper
+    //     {
+    //         gasPrice: gasPrice
+    //     }
+    // )    
+    // await mstableProvider.deployed()
     console.log('mstableProvider', mstableProvider.address)
 
 
@@ -53,12 +54,9 @@ async function main() {
  
     for (let i = 0; i < tokens.length; i++) {
         console.log('adding provider-token', tokens[i])
-        const provider = await savingAccounts.addProvider(mstableProvider.address, tokens[i], { gasPrice: gasPrice, gasLimit: 100000 })
+        const provider = await savingAccounts.addProvider(mstableProvider.address, tokens[i], { gasPrice: gasPrice, gasLimit: 200000 })
         await provider.wait()
     }
-
-    return
-
 
     const printBalances = async () => {
         const tasks = [
@@ -77,8 +75,8 @@ async function main() {
     await printBalances();
     console.log('')
 
-    console.log('depositAt')
-    const deposit = await savingAccounts.depositAt(tokens[0], '1000000', {
+    console.log('depositOn')
+    const deposit = await savingAccounts.depositOn(tokens[0], '1000000', {
         gasLimit: '1000000',
         gasPrice: gasPrice
     })
@@ -87,6 +85,17 @@ async function main() {
 
     await deposit.wait();
 
+    console.log('')
+    await printBalances();
+    console.log('')
+
+    console.log('withdrawOn')
+    const withdraw = await savingAccounts.withdrawOn(tokens[0], '1000000', {
+        gasLimit: '1000000',
+        gasPrice: gasPrice
+    })
+    await withdraw.wait();
+    
     console.log('')
     await printBalances();
     console.log('')
