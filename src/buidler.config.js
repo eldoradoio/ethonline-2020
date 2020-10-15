@@ -1,6 +1,8 @@
 const { config } = require('chai');
 
 usePlugin("@nomiclabs/buidler-waffle");
+usePlugin("buidler-typechain");
+
 require('dotenv').config();
 
 task("accounts", "Prints the list of accounts", async () => {
@@ -25,5 +27,9 @@ module.exports = {
       url: `https://ropsten.infura.io/v3/${INFURA_PROJECT_ID}`,
       accounts: [`0x${ROPSTEN_PRIVATE_KEY}`]
     }
-  }
+  },
+  typechain: {
+    outDir: "types",
+    target: "ethers-v5",
+  },
 };

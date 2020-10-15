@@ -2,8 +2,6 @@ const bre = require("@nomiclabs/buidler");
 const { BigNumber } = require('@ethersproject/bignumber')
 
 async function main() {
-
-    const MAssetAddress = "0x4E1000616990D83e56f4b5fC6CC8602DcfD20459" //MAsset
     const tokens = [
         '0xb5e5d0f8c0cba267cd3d7035d6adc8eba7df7cdd', //'DAI-MSTABLE'
         //'0x8a9447df1fb47209d36204e6d56767a33bf20f9f', // 'USDC-MSTABLE'
@@ -25,13 +23,13 @@ async function main() {
     const erc20 = erc20Factory.attach(tokens[0])
 
 
-    // const savingAccounts = await ElDoradoSavingAccounts.attach('0xdb73797F6956d9A25C345F6839847D3285D4A9F1')
-    console.log('deploying')
+    const savingAccounts = await ElDoradoSavingAccounts.attach('0x417558C27f04CEe2eA740723773f12b5C6764534')
+    // console.log('deploying')
 
-    const savingAccounts = await ElDoradoSavingAccounts.deploy({
-        gasPrice: gasPrice
-    })
-    await savingAccounts.deployed()
+    // const savingAccounts = await ElDoradoSavingAccounts.deploy({
+    //     gasPrice: gasPrice
+    // })
+    // await savingAccounts.deployed()
     console.log('savingAccounts', savingAccounts.address)
 
 
@@ -48,15 +46,15 @@ async function main() {
     console.log('mstableProvider', mstableProvider.address)
 
 
-    console.log('approving..')
-    /// TODO: IN a better way, and dynamic
-    const approved = await erc20.approve(mstableProvider.address, '10000000000000000000000000000', { gasPrice: gasPrice })
+    // console.log('approving..')
+    // /// TODO: IN a better way, and dynamic
+    // const approved = await erc20.approve(mstableProvider.address, '10000000000000000000000000000', { gasPrice: gasPrice })
  
-    for (let i = 0; i < tokens.length; i++) {
-        console.log('adding provider-token', tokens[i])
-        const provider = await savingAccounts.addProvider(mstableProvider.address, tokens[i], { gasPrice: gasPrice, gasLimit: 200000 })
-        await provider.wait()
-    }
+    // for (let i = 0; i < tokens.length; i++) {
+    //     console.log('adding provider-token', tokens[i])
+    //     const provider = await savingAccounts.addProvider(mstableProvider.address, tokens[i], { gasPrice: gasPrice, gasLimit: 200000 })
+    //     await provider.wait()
+    // }
 
     const printBalances = async () => {
         const tasks = [
@@ -71,12 +69,10 @@ async function main() {
         //return earntOf
     }
 
-    console.log('')
-    await printBalances();
-    console.log('')
+    console.log('');     await printBalances();   console.log('');
 
     console.log('depositOn')
-    const deposit = await savingAccounts.depositOn(tokens[0], '1000000', {
+    const deposit = await savingAccounts.depositOn(tokens[0], '10000000000000000', {
         gasLimit: '1000000',
         gasPrice: gasPrice
     })
@@ -85,20 +81,16 @@ async function main() {
 
     await deposit.wait();
 
-    console.log('')
-    await printBalances();
-    console.log('')
+    console.log('');     await printBalances();   console.log('');
 
     console.log('withdrawOn')
-    const withdraw = await savingAccounts.withdrawOn(tokens[0], '1000000', {
+    const withdraw = await savingAccounts.withdrawOn(tokens[0], '10000000000000000', {
         gasLimit: '1000000',
         gasPrice: gasPrice
     })
     await withdraw.wait();
     
-    console.log('')
-    await printBalances();
-    console.log('')
+    console.log('');     await printBalances();   console.log('');
 }
 
 main()
