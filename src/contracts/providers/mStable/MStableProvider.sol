@@ -34,8 +34,9 @@ contract MStableProvider {
         helper = _helper;
         totalDeposited = 0;
     }
+    
 
-    function approveToken(uint256 _tokenAddress) external returns (bool) {
+    function approveToken(address _tokenAddress) external returns(bool) {
         //TODO: owner only
 
         IERC20 token = IERC20(_tokenAddress);
@@ -45,11 +46,7 @@ contract MStableProvider {
         return true;
     }
 
-    function deposit(
-        address account,
-        address _tokenAddress,
-        uint256 _amount
-    ) external returns (uint256) {
+    function deposit(address account, address _tokenAddress, uint256 _amount) external returns(uint256) {
         //TODO: owner only
         //TODO Should not use sender but an from address
         require(_amount > 0, "Deposit amount must be greater than zero");
@@ -77,18 +74,18 @@ contract MStableProvider {
         return massetsMinted;
     }
 
-    function getBalance(address account) public view returns (uint256) {
+    function getBalance(address account) external view returns(uint256) {
         // Notes from mStable person:
         // The amount of mUSD this user owns at any point in time can then be calculated as creditsIssued * exchangeRate / 1e18;
-        return creditBalances[account] * savings.exchangeRate() / 1e18;
+        return _getBalance(account);
     }
 
     function getTotalBalances(address account) external view returns (uint256) {
         return helper.getSaveBalance(savings, address(this));
     }
 
-    function getEarnings(address account) external view returns (uint256) {
-        uint256 balance = getBalance(account);
+    function getEarnings(address account) external view returns(uint256) {
+        uint256 balance = _getBalance(account);
         if (balance <= depositedBalances[account]) return 0;
         return balance - depositedBalances[account];
     }
@@ -100,11 +97,7 @@ contract MStableProvider {
     }
 
     // Redeem + Swap back to basset
-    function withdraw(
-        address account,
-        address _tokenAddress,
-        uint256 _amount //This is in mstable with lots of digits xC
-    ) external returns (uint256) {
+    function withdraw(address account, address _tokenAddress, uint256 _amount) external returns(uint256) {
         require(_amount > 0, "Must withdraw something");
         // Get user credits
         uint256 creditUnits = helper.getSaveRedeemInput(savings, _amount);
@@ -177,8 +170,15 @@ contract MStableProvider {
         return helper.suggestMintAsset(address(masset));
     }
 
-    function getTotalDeposited() external view returns (uint256) {
+    function getTotalDeposited() external view returns (uint256){
         return totalDeposited;
     }
+
+    function _getBalance(address account) private view returns(uint256) {
+        // Notes from mStable person:
+        // The amount of mUSD this user owns at any point in time can then be calculated as creditsIssued * exchangeRate / 1e18;
+        return creditBalances[account] * savings.exchangeRate() / 1e18;
+    }
+
     // function creditBalances(address) external view returns (uint256);
 }

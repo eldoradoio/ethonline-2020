@@ -31,13 +31,13 @@ describe("ElDoradoSavingAccounts", function () {
 
     await savingAccounts.addProvider(mockProvider.address, erc20.address);
 
-    expect(await savingAccounts.getBalance()).to.equal('0');
+    expect(await savingAccounts.getBalance()).to.equal('0')
 
     await savingAccounts.depositAt(erc20.address, '100')
-    expect(await savingAccounts.getBalance()).to.equal('100');
+    expect(await savingAccounts.getBalance()).to.equal('100')
 
     await savingAccounts.depositAt(erc20.address, '150')
-    expect(await savingAccounts.getBalance()).to.equal('250');
+    expect(await savingAccounts.getBalance()).to.equal('250')
 
   })
 

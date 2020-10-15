@@ -77,12 +77,8 @@ contract ElDoradoSavingAccounts
   function _deposit(address sender, address providerAddress, address _tokenAddress, uint256 _amount) private returns(uint256){
     // TODO: Check if valid provider
     // TODO: Check if valid erc20 token
-      IElDoradoSavingsProvider(_providers.get(0)).getTotalDeposited();
-      //uint256 result = IElDoradoSavingsProvider(providerAddress).deposit(sender, _tokenAddress, _amount);
-      //_balances[sender] += result;
-      //return result;
-      return 0;
-  }
-
-  
+      uint256 result = IElDoradoSavingsProvider(providerAddress).deposit(sender, _tokenAddress, _amount);
+      _balances[sender] += result;
+      return result;
+  }  
 }
