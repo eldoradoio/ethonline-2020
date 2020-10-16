@@ -44,7 +44,7 @@ export function Account({ tokenAddress, }: AccountProps) {
             })
         }
     }
-
+    console.log(tokenBalance)
     return (
         <div style={{ display: 'flex' }}>
             <span style={{ flexGrow: 1 }}>{tokenName}: {tokenBalance ? formatTokenBalance(tokenBalance) : ''}</span>

@@ -19,7 +19,9 @@ const accounts = ElDoradoSavingAccountsFactory.connect('0xc9E3E339f3FCe60fafD35a
 
 
 export async function getConnectedAddress(): Promise<string> {
-    return await signer.getAddress()
+    const address = await signer.getAddress()
+    console.log(address)
+    return address
 }
 
 export function getBalance(): Promise<BigNumber> {
@@ -48,7 +50,7 @@ export async function getTokenBalance(tokenAddress: string): Promise<TokenBalanc
 }
 
 export async function approve(tokenAddress: string): Promise<void> {
-    const erc20 = Erc20DetailedFactory.connect(tokenAddress, provider)
+    const erc20 = Erc20DetailedFactory.connect(tokenAddress, signer)
     const savingsProvider = await accounts.getProviderByToken(tokenAddress)
     const tx = await erc20.approve(savingsProvider, BigNumber.from('2').pow('256').sub('1'))
     await tx.wait()
@@ -56,9 +58,10 @@ export async function approve(tokenAddress: string): Promise<void> {
 
 
 export async function deposit(tokenAddress: string, amount: BigNumber): Promise<void> {
-    await accounts.depositOn(tokenAddress, amount, {
+    const tx = await accounts.depositOn(tokenAddress, amount, {
         gasLimit: 850000
     })
+    await tx.wait()
 }
 
 export type TokenBalance = {
