@@ -4,18 +4,18 @@ import { deposit, getTokenBalance, getTokenName, TokenBalance } from './accounts
 import { AsyncButton } from './AsyncButton';
 
 type AccountProps = {
-    token: string
+    tokenAddress: string
 }
-export function Account({ token }: AccountProps) {
+export function Account({ tokenAddress }: AccountProps) {
     const [amount, setAmount] = useState<BigNumber>();
 
     const [tokenName, setTokenName] = useState<string>('---')
     const [tokenBalance, setTokenBalance] = useState<TokenBalance>()
 
     useEffect(() => {
-        getTokenName(token).then(setTokenName)
-        getTokenBalance(token).then(setTokenBalance)
-    }, [token])
+        getTokenName(tokenAddress).then(setTokenName)
+        getTokenBalance(tokenAddress).then(setTokenBalance)
+    }, [tokenAddress])
 
     const formatTokenBalance = (tb: TokenBalance): string => {
         //TODO: import a better bignumber than the ethersjs one.. w(ﾟДﾟ)w
@@ -24,7 +24,6 @@ export function Account({ token }: AccountProps) {
         const by = BigNumber.from('1' + ''.padEnd(tb.decimals - formattedDecimals, '0'))
 
         return (tb.balance.div(by).toNumber() / decimals).toFixed(formattedDecimals)
-
     }
 
     return (
@@ -43,9 +42,9 @@ export function Account({ token }: AccountProps) {
                 </span>
                 <span>
                     <AsyncButton
-                        key={token}
+                        key={tokenAddress}
                         disabled={amount ? false : true}
-                        onClick={() => amount ? deposit(amount) : undefined}
+                        onClick={() => amount ? deposit(tokenAddress, amount) : undefined}
                     ></AsyncButton>
                 </span>
             </span>

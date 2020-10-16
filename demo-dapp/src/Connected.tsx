@@ -19,7 +19,7 @@ export function Connected({ address }: ConnectedProps) {
     }, [address])
 
     const accountItems = accounts?.map(x => {
-        return (<Account key={x} token={x} ></Account>)
+        return (<Account key={x} tokenAddress={x} ></Account>)
     })
 
     const formatAddress = (address: string) => {

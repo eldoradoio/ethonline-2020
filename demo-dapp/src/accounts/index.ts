@@ -5,32 +5,25 @@ import Web3 from 'web3';
 
 
 
-import { ElDoradoSavingAccounts } from '../assets/types/ElDoradoSavingAccounts'
-import ElDoradoSavingAccountsArtifact from '../assets/artifacts/ElDoradoSavingAccounts.json'
-
+import { ElDoradoSavingAccountsFactory } from '../assets/types/ElDoradoSavingAccountsFactory'
 import { Erc20DetailedFactory } from '../assets/types/Erc20DetailedFactory'
 
 const network = 'ropsten'
 
 const portis = new Portis('89eb3ac5-6738-42b7-98c0-3e3ca4a39853', network);
-//const web3 = new Web3(portis.provider);
-
 const provider = new ethers.providers.Web3Provider(portis.provider)
-const accounts: ElDoradoSavingAccounts =
-    new ethers.Contract('0x417558c27f04cee2ea740723773f12b5c6764534', ElDoradoSavingAccountsArtifact.abi, provider) as ElDoradoSavingAccounts;
-
 const signer = provider.getSigner()
+
+
+const accounts = ElDoradoSavingAccountsFactory.connect('0x417558c27f04cee2ea740723773f12b5c6764534', signer)
+
 
 export async function getConnectedAddress(): Promise<string> {
     return await signer.getAddress()
 }
 
-export async function getBalance(): Promise<BigNumber> {
-    const balance = await accounts.getBalance()
-    console.log('balance', balance)
-    //new ethers.(ElDoradoSavingAccountsArtifact, ).attach('')
-
-    return balance
+export function getBalance(): Promise<BigNumber> {
+    return accounts.getBalance()
 }
 
 export async function getAccounts(): Promise<string[]> {
@@ -52,8 +45,10 @@ export async function getTokenBalance(tokenAddress: string): Promise<TokenBalanc
 }
 
 
-export async function deposit(amount: BigNumber): Promise<void> {
-
+export async function deposit(tokenAddress:string, amount: BigNumber): Promise<void> {
+    await accounts.depositOn(tokenAddress, amount, {
+        gasLimit: 850000
+    })
 }
 
 export type TokenBalance = {
