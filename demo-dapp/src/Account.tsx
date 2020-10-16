@@ -1,6 +1,6 @@
-import { BigNumber } from 'ethers';
 import React, { Props, useEffect, useState } from 'react'
-import { deposit, getTokenName } from './accounts';
+import { BigNumber } from 'ethers';
+import { deposit, getTokenBalance, getTokenName, TokenBalance } from './accounts';
 import { AsyncButton } from './AsyncButton';
 
 type AccountProps = {
@@ -8,32 +8,48 @@ type AccountProps = {
 }
 export function Account({ token }: AccountProps) {
     const [amount, setAmount] = useState<BigNumber>();
+
     const [tokenName, setTokenName] = useState<string>('---')
+    const [tokenBalance, setTokenBalance] = useState<TokenBalance>()
 
     useEffect(() => {
         getTokenName(token).then(setTokenName)
+        getTokenBalance(token).then(setTokenBalance)
     }, [token])
 
-    return (<div>
-        <span>{tokenName}</span>
-        <span>
-            <input onChange={(x) => {
-                try {
-                    setAmount(BigNumber.from(x.target.value))
+    const formatTokenBalance = (tb: TokenBalance): string => {
+        //TODO: import a better bignumber than the ethersjs one.. w(ﾟДﾟ)w
+        const formattedDecimals = 2
+        const decimals =  Math.pow(10, formattedDecimals)
+        const by = BigNumber.from('1' + ''.padEnd(tb.decimals - formattedDecimals, '0'))
 
-                } catch {
-                    setAmount(undefined)
-                }
-            }}></input>
-        </span>
-        <span>
-            <AsyncButton
-                key={token}
-                disabled={amount ? false : true}
-                onClick={() => amount ? deposit(amount) : undefined}
-            ></AsyncButton>
-        </span>
-    </div>)
+        return (tb.balance.div(by).toNumber() / decimals).toFixed(formattedDecimals)
+
+    }
+
+    return (
+        <div style={{ display: 'flex' }}>
+            <span style={{ flexGrow: 1 }}>{tokenName}: {tokenBalance ? formatTokenBalance(tokenBalance) : ''}</span>
+            <span style={{ flexGrow: 1 }}>
+                <span>
+                    <input onChange={(x) => {
+                        try {
+                            setAmount(BigNumber.from(x.target.value))
+
+                        } catch {
+                            setAmount(undefined)
+                        }
+                    }}></input>
+                </span>
+                <span>
+                    <AsyncButton
+                        key={token}
+                        disabled={amount ? false : true}
+                        onClick={() => amount ? deposit(amount) : undefined}
+                    ></AsyncButton>
+                </span>
+            </span>
+        </div>)
 }
 
 /**

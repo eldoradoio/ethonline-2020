@@ -1,31 +1,28 @@
 import React, { useEffect, useState } from 'react';
 import logo from './logo.svg';
 import './App.css';
-import { getAccounts, getBalance } from './accounts';
-import { BigNumber } from 'ethers';
-import { Account } from './Account';
+import { getConnectedAddress } from './accounts';
+import { Connected } from './Connected';
 
 function App() {
-  const [balance, setBalance] = useState<BigNumber>()
-  const [accounts, setAccounts] = useState<string[]>()
+  
+  const [connectedAddress, setConnectedAddress] = useState<string>()
 
   useEffect(() => {
-    getBalance().then(setBalance)
-    getAccounts().then(setAccounts)
-  }, [])
+    getConnectedAddress().then(setConnectedAddress)
+  }, [connectedAddress])
 
-  const accountItems = accounts?.map(x => {
-    return (<Account key={x} token={x} ></Account>)
-  })
 
+  console.log('connectedAddress', connectedAddress)
   return (
     <div className="App">
       <header className="App-header">
-        <p>
-          Savings Balance: {balance?.toString()}
-        </p>
-        {accountItems}
+        <h2>
+          El Dorado Saving Accounts
+        </h2>
+        {connectedAddress ? <Connected address={connectedAddress} /> : (<div>Disconnected</div>)}
       </header>
+
     </div>
   );
 }
