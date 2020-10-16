@@ -48,15 +48,10 @@ export async function getTokenBalance(tokenAddress: string): Promise<TokenBalanc
 }
 
 export async function approve(tokenAddress: string): Promise<void> {
-    try {
-        const erc20 = Erc20DetailedFactory.connect(tokenAddress, provider)
-        const savingsProvider = await accounts.getProviderByToken(tokenAddress)
-        const tx = await erc20.approve(savingsProvider, BigNumber.from('2').pow('256').sub('1'))
-        await tx.wait()
-    }
-    catch (e) {
-        
-    }
+    const erc20 = Erc20DetailedFactory.connect(tokenAddress, provider)
+    const savingsProvider = await accounts.getProviderByToken(tokenAddress)
+    const tx = await erc20.approve(savingsProvider, BigNumber.from('2').pow('256').sub('1'))
+    await tx.wait()
 }
 
 

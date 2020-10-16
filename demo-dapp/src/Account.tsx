@@ -1,7 +1,8 @@
-import React, { Props, useEffect, useState } from 'react'
+import React, { Props, useContext, useEffect, useState } from 'react'
 import { BigNumber } from 'ethers';
 import { approve, deposit, getTokenBalance, getTokenName, TokenBalance } from './accounts';
 import { AsyncButton } from './AsyncButton';
+import { ActionTypes, MessagingContext } from './Messages';
 
 type AccountProps = {
     tokenAddress: string
@@ -11,6 +12,8 @@ export function Account({ tokenAddress, }: AccountProps) {
 
     const [tokenName, setTokenName] = useState<string>('---')
     const [tokenBalance, setTokenBalance] = useState<TokenBalance>()
+
+    const messaging = useContext(MessagingContext)
 
     useEffect(() => {
         getTokenName(tokenAddress).then(setTokenName)
@@ -27,6 +30,20 @@ export function Account({ tokenAddress, }: AccountProps) {
     }
 
 
+    const approveClick = async () => {
+        try{
+            await approve(tokenAddress)
+        }catch(ex){
+            messaging.dispatcher({
+                message:{
+                    body: ex.toString(),
+                    timestamp: Date.now(),
+                    type: 'error'
+                },
+                type: ActionTypes.ADD_MESSAGE
+            })
+        }
+    }
 
     return (
         <div style={{ display: 'flex' }}>
@@ -60,7 +77,7 @@ export function Account({ tokenAddress, }: AccountProps) {
                     (<AsyncButton
                         key={tokenAddress}
                         disabled={false}
-                        onClick={() => approve(tokenAddress)}
+                        onClick={approveClick}
                     >
                         Approve use of tokens
                     </AsyncButton>)
@@ -70,3 +87,4 @@ export function Account({ tokenAddress, }: AccountProps) {
         </div>)
 }
 
+//approve(tokenAddress)

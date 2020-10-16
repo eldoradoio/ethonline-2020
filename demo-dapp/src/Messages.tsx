@@ -1,18 +1,19 @@
-import React, { useReducer } from "react";
+import React, { useContext, useReducer } from "react";
 import './Messages.css';
 
 type ToastProps = {
     type: 'error' | "success" | "info"
     children: any
+    ago: number
 }
 
-export function Toast({ type, children }: ToastProps) {
+export function Toast({ type, children, ago }: ToastProps) {
     return (
         <div className={"toast show " + type} role="alert" aria-live="assertive" aria-atomic="true">
             <div className="toast-header">
                 {/* <img src="..." className="rounded mr-2" alt="..." /> */}
                 <strong className="title"> </strong>
-                <small className="time">11 mins ago</small>
+                <small className="time">{ago} seconds ago</small>
                 <button type="button" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -35,7 +36,7 @@ interface MessageAction {
     message: ToastInfo
 }
 
-type MessasingActionTypes =
+export type MessasingActionTypes =
     | MessageAction
 
 type ToastInfo = {
@@ -43,42 +44,39 @@ type ToastInfo = {
     timestamp: number
     type: "error" | "info" | "success"
 }
-type MessagingState = {
-    messages: ToastInfo[]
-}
-const messagingState: MessagingState = {
-    messages: []
-}
+type MessagingState = ToastInfo[]
+
+export const CurrentMessagingState: MessagingState = []
 
 
-// export const GlobalContext = React.createContext<{ state: MessagingState, dispatch: React.Dispatch<MessasingActionTypes> }>({
-//     state: state,
-//     dispatch: () => null
-// })
+export const MessagingContext = React.createContext<{ state: MessagingState, dispatcher: React.Dispatch<MessasingActionTypes> }>({
+    state: CurrentMessagingState,
+    dispatcher: () => null
+})
+
 
 export const messaging = (state: MessagingState, action: MessasingActionTypes) => {
+    console.log('messaging', state, action)
     switch (action.type) {
         case ActionTypes.ADD_MESSAGE:
-            state.messages.push(action.message)
-            break;
+            return [...state, action.message]
         case ActionTypes.ADD_MESSAGE:
-            //state.messages.push(action.message)
-            break;
+            return state;
     }
-    return state
 }
 
 
 
-export function Messages({ messages }: MessagingState) {
+export function Messages() {
+    const { state } = useContext(MessagingContext)
+
     return (
         <div className="toasts">
-            {messages.map(x => (
-                <Toast type={x.type}>{x.body}</Toast>
+            {state.map((x, i) => (
+                <Toast key={`messageindex${i}`}
+                    ago={Date.now() - x.timestamp}
+                    type={x.type}>{x.body}</Toast>
             ))}
-            {/* <Toast type="error">Some error message</Toast>
-            <Toast type="success">Some success message</Toast>
-            <Toast type="info">Some info message</Toast> */}
         </div>
     )
 }
