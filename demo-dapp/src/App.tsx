@@ -1,23 +1,30 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import logo from './logo.svg';
 import './App.css';
+import { getAccounts, getBalance } from './accounts';
+import { BigNumber } from 'ethers';
+import { Account } from './Account';
 
 function App() {
+  const [balance, setBalance] = useState<BigNumber>()
+  const [accounts, setAccounts] = useState<string[]>()
+
+  useEffect(() => {
+    getBalance().then(setBalance)
+    getAccounts().then(setAccounts)
+  }, [])
+
+  const accountItems = accounts?.map(x => {
+    return (<Account key={x} token={x} ></Account>)
+  })
+
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
         <p>
-          Edit <code>src/App.tsx</code> and save to reload.
+          Savings Balance: {balance?.toString()}
         </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+        {accountItems}
       </header>
     </div>
   );

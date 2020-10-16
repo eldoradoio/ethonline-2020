@@ -1,0 +1,22 @@
+button{
+    padding: 0.6rem;
+    border: 0.5rem solid #663399; 
+    border-radius: 0.3rem;
+    font-size: 1.2rem;
+    background: rebeccapurple;
+    color: white;
+    cursor: pointer
+  }
+
+  button:hover{
+    border-color: #7040aa;
+    background: #7040aa;
+  }
+  
+  button:disabled,
+  button[disabled]{
+    border-color: #cccccc;
+    background-color: #cccccc;
+    color: #555555;
+    cursor: not-allowed
+  }

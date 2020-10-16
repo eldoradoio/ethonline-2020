@@ -3,11 +3,15 @@ pragma solidity >=0.5.15;
 
 // We use this reference so buidler adds the artifact for us to use in the tests
 import "@openzeppelin/contracts/token/ERC20/ERC20Mintable.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20Detailed.sol";
+
+
 import "@openzeppelin/contracts/utils/EnumerableSet.sol";
 
 import "../../IElDoradoSavingsProvider.sol";
 
 import "@nomiclabs/buidler/console.sol";
+
 
 contract MockProvider is IElDoradoSavingsProvider {
     using EnumerableSet for EnumerableSet.AddressSet;
