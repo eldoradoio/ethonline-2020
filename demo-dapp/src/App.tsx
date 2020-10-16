@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import logo from './logo.svg';
+import logo from './logo.webp';
 import './App.css';
 import { getConnectedAddress } from './accounts';
 import { Connected } from './Connected';
 
 function App() {
-  
+
   const [connectedAddress, setConnectedAddress] = useState<string>()
 
   useEffect(() => {
@@ -16,9 +16,13 @@ function App() {
   console.log('connectedAddress', connectedAddress)
   return (
     <div className="App">
+      <menu>
+        <img src={logo} height="100%" />
+      </menu>
       <header className="App-header">
+
         <h2>
-          El Dorado Saving Accounts
+          Saving Accounts
         </h2>
         {connectedAddress ? <Connected address={connectedAddress} /> : (<div>Disconnected</div>)}
       </header>
