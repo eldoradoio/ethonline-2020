@@ -3,6 +3,7 @@ import logo from './logo.webp';
 import './App.css';
 import { getConnectedAddress } from './accounts';
 import { Connected } from './Connected';
+import { Messages } from './Messages';
 
 function App() {
 
@@ -26,6 +27,7 @@ function App() {
         </h2>
         {connectedAddress ? <Connected address={connectedAddress} /> : (<div>Disconnected</div>)}
       </header>
+      <Messages></Messages>
 
     </div>
   );

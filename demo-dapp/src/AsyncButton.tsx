@@ -4,9 +4,10 @@ import './AsyncButton.css';
 type AsyncButtonProps = {
     onClick: Function
     disabled: boolean
+    children: any
 }
 
-export function AsyncButton({ onClick, disabled }: AsyncButtonProps) {
+export function AsyncButton({ onClick, disabled, children }: AsyncButtonProps) {
     const [processing, setProcessing] = useState<boolean>(false)
     return <button disabled={disabled || processing} onClick={async () => {
         setProcessing(true)
@@ -18,5 +19,5 @@ export function AsyncButton({ onClick, disabled }: AsyncButtonProps) {
         } else {
             setProcessing(false)
         }
-    }} >Deposit</button>
+    }} >{children}</button>
 }

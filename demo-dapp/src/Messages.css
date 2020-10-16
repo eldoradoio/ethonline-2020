@@ -1,0 +1,124 @@
+.toasts{
+    position: absolute;
+    top: auto;
+    bottom: 0;
+    left: auto;
+    right: 0;
+    max-width: 100%;
+    width: 30rem;
+}
+
+.toast {
+    visibility: hidden;
+    height: 4rem;
+    /*margin-left: -125px;*/
+    margin-bottom: 1rem;
+    margin-right: 1rem;
+    background-color: #333;
+    color: #fff;
+    text-align: left;
+    border-radius: 2px;
+
+    /* position: fixed; */
+    z-index: 1;
+    /* left: 0;
+    right:0;
+    bottom: 30px; */
+    font-size: 15px;
+    white-space: nowrap;
+
+    border:0.5rem;
+}
+
+.toast.success {
+    box-shadow: 0 0 7px 0px #00ff00A0;
+    border: 1px solid green;
+}
+.toast.info {
+    box-shadow: 0 0 7px 0px #0063d4A0;
+    border: 1px solid #0063d4;
+}
+.toast.error {
+    box-shadow: 0 0 7px 0px #FF0000A0;
+    border: 1px solid red;
+}
+
+.toast .img{
+	width: 4rem;
+	height: 4rem;
+    
+    float: left;
+    
+    padding-top: 16px;
+    padding-bottom: 16px;
+    
+    box-sizing: border-box;
+
+    background-color: #111;
+    color: #fff;
+}
+
+.toast button{
+    height: 100% !important;
+    padding: 0 !important;
+    border-left: 0.5rem solid #444;
+    border-right: 0.5rem solid #444;
+    border-top: 0.2rem solid #444;
+    border-bottom: 0.2rem solid #444;
+    background-color: #444;
+}
+
+.toast .desc{    
+    color: #fff;   
+    padding: 16px;    
+    overflow: hidden;
+	white-space: nowrap;
+}
+
+.toast-header{
+    display: flex;
+    border-bottom: 1px solid #262729;
+}
+
+.toast .title{
+    flex-grow: 1;
+}
+
+.toast .time{
+    padding-right: 0.5rem;
+    line-height: 1.7rem;
+    color: #ddd;
+}
+.toast .body{
+    padding: 0.5rem;
+}
+
+.toast.show {
+    visibility: visible;
+    -webkit-animation: fadein 1s;
+    animation: fadein 1s
+}
+.toast.dismiss{
+    -webkit-animation: fadeout 0.5s 2.5s;
+    animation: fadeout 0.5s 4.5s;
+}
+
+@-webkit-keyframes fadein {
+    from {opacity: 0;} 
+    to {opacity: 1;}
+}
+
+@keyframes fadein {
+    from { opacity: 0;}
+    to { opacity: 1;}
+}
+
+@-webkit-keyframes fadeout {
+    from { opacity: 1;} 
+    to { opacity: 0;}
+}
+
+@keyframes fadeout {
+    from { opacity: 1;}
+    to { opacity: 0;}
+}

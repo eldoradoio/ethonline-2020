@@ -1,7 +1,7 @@
 const { config } = require('chai');
 
 usePlugin("@nomiclabs/buidler-waffle");
-usePlugin("buidler-typechain");
+//usePlugin("buidler-typechain"); //disabled until they update to typechain v3
 
 require('dotenv').config();
 

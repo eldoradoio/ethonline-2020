@@ -23,13 +23,13 @@ async function main() {
     const erc20 = erc20Factory.attach(tokens[0])
 
 
-    const savingAccounts = await ElDoradoSavingAccounts.attach('0x417558C27f04CEe2eA740723773f12b5C6764534')
-    // console.log('deploying')
+    //const savingAccounts = await ElDoradoSavingAccounts.attach('0x417558C27f04CEe2eA740723773f12b5C6764534')
+    console.log('deploying')
 
-    // const savingAccounts = await ElDoradoSavingAccounts.deploy({
-    //     gasPrice: gasPrice
-    // })
-    // await savingAccounts.deployed()
+    const savingAccounts = await ElDoradoSavingAccounts.deploy({
+        gasPrice: gasPrice
+    })
+    await savingAccounts.deployed()
     console.log('savingAccounts', savingAccounts.address)
 
 
@@ -46,15 +46,15 @@ async function main() {
     console.log('mstableProvider', mstableProvider.address)
 
 
-    // console.log('approving..')
-    // /// TODO: IN a better way, and dynamic
-    // const approved = await erc20.approve(mstableProvider.address, '10000000000000000000000000000', { gasPrice: gasPrice })
+    console.log('approving..')
+    /// TODO: IN a better way, and dynamic
+    const approved = await erc20.approve(mstableProvider.address, '10000000000000000000000000000', { gasPrice: gasPrice })
  
-    // for (let i = 0; i < tokens.length; i++) {
-    //     console.log('adding provider-token', tokens[i])
-    //     const provider = await savingAccounts.addProvider(mstableProvider.address, tokens[i], { gasPrice: gasPrice, gasLimit: 200000 })
-    //     await provider.wait()
-    // }
+    for (let i = 0; i < tokens.length; i++) {
+        console.log('adding provider-token', tokens[i])
+        const provider = await savingAccounts.addProvider(mstableProvider.address, tokens[i], { gasPrice: gasPrice, gasLimit: 200000 })
+        await provider.wait()
+    }
 
     const printBalances = async () => {
         const tasks = [

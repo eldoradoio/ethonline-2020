@@ -20,7 +20,7 @@ contract ElDoradoSavingAccounts
   EnumerableSet.AddressSet private _providers;
   mapping (address => address) private _token_provider;
   mapping (address => uint256)  private _balances;
-  mapping (address => address)  private _accounts_providers;
+  //mapping (address => mapping(address => address))  private _accounts_providers;
 
   constructor() /*Ownable()*/ public {
     console.log("Deploying ElDoradoSavingsAccounts Contract");
@@ -34,6 +34,10 @@ contract ElDoradoSavingAccounts
 
   function getProviderByIndex(uint256 index) public view returns (address) {
     return _providers.get(index);
+  }
+
+  function getProviderByToken(address _tokenAddress) public view returns (address) {
+    return  _token_provider[_tokenAddress];
   }
 
   function addProvider(address providerAddress, address _tokenAddress) public {
@@ -50,11 +54,11 @@ contract ElDoradoSavingAccounts
   }
 
   function depositOn(address _tokenAddress, uint256 _amount) external returns(uint256) {
-      return _deposit(msg.sender, _token_provider[_tokenAddress], _tokenAddress, _amount);
+      return _deposit(msg.sender, getProviderByToken(_tokenAddress), _tokenAddress, _amount);
   }
 
   function withdrawOn(address _tokenAddress, uint256 _amount) external returns(uint256)  {
-    return _withdraw(msg.sender, _token_provider[_tokenAddress], _tokenAddress,_amount);
+    return _withdraw(msg.sender, getProviderByToken(_tokenAddress), _tokenAddress,_amount);
   }
 
   function getBalance() external view returns(uint256){
@@ -83,6 +87,8 @@ contract ElDoradoSavingAccounts
     // TODO: Check if valid erc20 token
       uint256 result = IElDoradoSavingsProvider(_providerAddress).deposit(account, _tokenAddress, _amount);
       _balances[account] += result;
+    //TODO Keep track of providers used per account
+    // _accounts_providers[account] = _providerAddress
       return result;
   }  
 

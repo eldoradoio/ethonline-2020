@@ -15,7 +15,7 @@ const provider = new ethers.providers.Web3Provider(portis.provider)
 const signer = provider.getSigner()
 
 
-const accounts = ElDoradoSavingAccountsFactory.connect('0x417558c27f04cee2ea740723773f12b5c6764534', signer)
+const accounts = ElDoradoSavingAccountsFactory.connect('0xc9E3E339f3FCe60fafD35aC6b73CEeE1A4D3Ba88', signer)
 
 
 export async function getConnectedAddress(): Promise<string> {
@@ -38,20 +38,31 @@ export async function getTokenName(tokenAddress: string): Promise<string> {
 export async function getTokenBalance(tokenAddress: string): Promise<TokenBalance> {
     const erc20 = Erc20DetailedFactory.connect(tokenAddress, provider)
     const address = await getConnectedAddress()
+    const savingsProvider = await accounts.getProviderByToken(tokenAddress)
+
     return {
         balance: await erc20.balanceOf(address),
-        decimals: await erc20.decimals()
+        decimals: await erc20.decimals(),
+        allowance: await erc20.allowance(address, savingsProvider)
     }
 }
 
+export async function approve(tokenAddress: string): Promise<void> {
+    const erc20 = Erc20DetailedFactory.connect(tokenAddress, provider)
+    const savingsProvider = await accounts.getProviderByToken(tokenAddress)
+    const tx = await erc20.approve(savingsProvider, BigNumber.from('2').pow('256').sub('1'))
+    await tx.wait()
+}
 
-export async function deposit(tokenAddress:string, amount: BigNumber): Promise<void> {
+
+export async function deposit(tokenAddress: string, amount: BigNumber): Promise<void> {
     await accounts.depositOn(tokenAddress, amount, {
         gasLimit: 850000
     })
 }
 
 export type TokenBalance = {
-    balance: BigNumber,
+    balance: BigNumber
     decimals: number
+    allowance: BigNumber
 }
