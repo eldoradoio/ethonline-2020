@@ -25,6 +25,7 @@ export async function getConnectedAddress(): Promise<string> {
 }
 
 export function getBalance(): Promise<BigNumber> {
+    //getEarnings
     return accounts.getBalance()
 }
 
@@ -59,6 +60,14 @@ export async function approve(tokenAddress: string): Promise<void> {
 
 export async function deposit(tokenAddress: string, amount: BigNumber): Promise<void> {
     const tx = await accounts.depositOn(tokenAddress, amount, {
+        gasLimit: 850000
+    })
+    await tx.wait()
+}
+
+
+export async function withdraw(tokenAddress: string, amount: BigNumber): Promise<void> {
+    const tx = await accounts.withdrawOn(tokenAddress, amount, {
         gasLimit: 850000
     })
     await tx.wait()

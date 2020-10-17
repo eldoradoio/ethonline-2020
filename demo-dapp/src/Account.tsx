@@ -1,6 +1,6 @@
 import React, { Props, useContext, useEffect, useState } from 'react'
 import { BigNumber } from 'ethers';
-import { approve, deposit, getTokenBalance, getTokenName, TokenBalance } from './accounts';
+import { approve, deposit, getTokenBalance, getTokenName, TokenBalance, withdraw } from './accounts';
 import { AsyncButton } from './AsyncButton';
 import { ActionTypes, MessagingContext } from './Messages';
 
@@ -18,7 +18,7 @@ export function Account({ tokenAddress, }: AccountProps) {
     useEffect(() => {
         getTokenName(tokenAddress).then(setTokenName)
         getTokenBalance(tokenAddress).then(setTokenBalance)
-    }, [tokenAddress])
+    }, [tokenAddress, messaging.state.length])
 
     const formatTokenBalance = (tb: TokenBalance): string => {
         //TODO: import a better bignumber than the ethersjs one.. w(ﾟДﾟ)w
@@ -29,13 +29,21 @@ export function Account({ tokenAddress, }: AccountProps) {
         return (tb.balance.div(by).toNumber() / decimals).toFixed(formattedDecimals)
     }
 
-
-    const approveClick = async () => {
-        try{
-            await approve(tokenAddress)
-        }catch(ex){
+    const tryCall = async (action: Function, sucessMessage: string) => {
+        try {
+            await action()
             messaging.dispatcher({
-                message:{
+                message: {
+                    body: sucessMessage || "Action completed!",
+                    timestamp: Date.now(),
+                    type: 'error'
+                },
+                type: ActionTypes.ADD_MESSAGE
+            })
+
+        } catch (ex) {
+            messaging.dispatcher({
+                message: {
                     body: ex.toString(),
                     timestamp: Date.now(),
                     type: 'error'
@@ -44,7 +52,7 @@ export function Account({ tokenAddress, }: AccountProps) {
             })
         }
     }
-    console.log(tokenBalance)
+
     return (
         <div style={{ display: 'flex' }}>
             <span style={{ flexGrow: 1 }}>{tokenName}: {tokenBalance ? formatTokenBalance(tokenBalance) : ''}</span>
@@ -66,9 +74,18 @@ export function Account({ tokenAddress, }: AccountProps) {
                                 <AsyncButton
                                     key={tokenAddress}
                                     disabled={amount ? false : true}
-                                    onClick={() => amount ? deposit(tokenAddress, amount) : undefined}
+                                    onClick={() => amount ? tryCall(()=>deposit(tokenAddress, amount), "Deposit succeeded!") : undefined}
                                 >
                                     Deposit
+                                </AsyncButton>
+                            </span>
+                            <span>
+                                <AsyncButton
+                                    key={tokenAddress}
+                                    disabled={amount ? false : true}
+                                    onClick={() => amount ? tryCall(() => withdraw(tokenAddress, amount), "Withdraw completed!") : undefined}
+                                >
+                                    Withdraw
                                 </AsyncButton>
                             </span>
                         </React.Fragment>
@@ -77,7 +94,7 @@ export function Account({ tokenAddress, }: AccountProps) {
                     (<AsyncButton
                         key={tokenAddress}
                         disabled={false}
-                        onClick={approveClick}
+                        onClick={() => tryCall(() => approve(tokenAddress), "Use of tokens approved")}
                     >
                         Approve use of tokens
                     </AsyncButton>)

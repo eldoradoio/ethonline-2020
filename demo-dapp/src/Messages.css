@@ -92,6 +92,7 @@
 .toast .body{
     padding: 0.5rem;
     white-space: normal;
+    word-break: break-word;
 }
 
 .toast.show {
