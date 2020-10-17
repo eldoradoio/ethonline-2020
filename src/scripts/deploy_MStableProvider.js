@@ -80,8 +80,8 @@ async function main() {
 
   const printBalances = async () => {
     const tasks = [
-      mstableProvider.getBalance(signerAddress),
-      mstableProvider.getEarnings(signerAddress),
+      mstableProvider.getBalance(signerAddress, erc20Address),
+      mstableProvider.getEarnings(signerAddress, erc20Address),
       erc20.balanceOf(signerAddress),
       mAsset.balanceOf(mstableProviderAddress),
       mstableProvider.exchangeRate(),
@@ -176,7 +176,7 @@ async function main() {
     // await redeemAssetsResult.wait()
   }
   else {
-    const withdrawAmount = await mstableProvider.getBalance(signerAddress)
+    const withdrawAmount = await mstableProvider.getBalance(signerAddress, erc20Address)
     console.log('Withdrawing', withdrawAmount.toString())
 
 

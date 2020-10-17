@@ -74,27 +74,20 @@ contract MStableProvider {
         return massetsMinted;
     }
 
-    function getBalance(address account) external view returns(uint256) {
+    function getBalance(address account, address _tokenAddress) external view returns(uint256) {
         // Notes from mStable person:
         // The amount of mUSD this user owns at any point in time can then be calculated as creditsIssued * exchangeRate / 1e18;
         return _getBalance(account);
     }
 
-    function getTotalBalances(address account) external view returns (uint256) {
-        return helper.getSaveBalance(savings, address(this));
+    function getDeposited(address account, address _tokenAddress) external view returns (uint256) {
+        return _getDeposited(account);
     }
 
-    function getEarnings(address account) external view returns(uint256) {
-        uint256 balance = _getBalance(account);
-        if (balance <= depositedBalances[account]) return 0;
-        return balance - depositedBalances[account];
+    function getEarnings(address account, address _tokenAddress) external view returns(uint256) {
+        return _getEarnings(account);
     }
 
-    function getTotalEarnings() external view returns (uint256) {
-        uint256 balance = helper.getSaveBalance(savings, address(this));
-        if (balance <= totalDeposited) return 0;
-        return balance - totalDeposited;
-    }
 
     // Redeem + Swap back to basset
     function withdraw(address account, address _tokenAddress, uint256 _amount) external returns(uint256) {
@@ -130,30 +123,6 @@ contract MStableProvider {
         return redeemed;
     }
 
-    // // AUXILIARY METHODS
-
-    // // From deposit to mAsset
-    // function redeemDeposit(uint256 _amount) external returns (uint256) {
-    //     require(_amount > 0, "Must redeem something");
-    //     uint256 creditUnits = helper.getSaveRedeemInput(savings, _amount);
-    //     return savings.redeem(creditUnits);
-    // }
-
-    // //from M
-    // function redeemAssets(address _tokenAddress, uint256 _amount)
-    //     external
-    //     returns (uint256)
-    // {
-    //     require(_amount > 0, "Must redeem something");
-    //     uint256 redeemed = masset.redeemTo(
-    //         address(_tokenAddress),
-    //         _amount,
-    //         msg.sender
-    //     );
-    //     totalDeposited -= _amount;
-    //     return redeemed;
-    // }
-
     function exchangeRate() external view returns (uint256) {
         return savings.exchangeRate();
     }
@@ -174,10 +143,27 @@ contract MStableProvider {
         return totalDeposited;
     }
 
+    function getTotalEarnings() external view returns (uint256) {
+        uint256 balance = helper.getSaveBalance(savings, address(this));
+        if (balance <= totalDeposited) return 0;
+        return balance - totalDeposited;
+    }
+
+    function _getEarnings(address account) private view returns(uint256) {
+        uint256 balance = _getBalance(account);
+        uint256 deposited = _getDeposited(account);
+        if (balance <= deposited) return 0;
+        return balance - deposited;
+    }
+
     function _getBalance(address account) private view returns(uint256) {
         // Notes from mStable person:
         // The amount of mUSD this user owns at any point in time can then be calculated as creditsIssued * exchangeRate / 1e18;
         return creditBalances[account] * savings.exchangeRate() / 1e18;
+    }
+
+    function _getDeposited(address account) private view returns(uint256) {
+        return depositedBalances[account];
     }
 
     // function creditBalances(address) external view returns (uint256);

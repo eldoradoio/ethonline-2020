@@ -23,17 +23,14 @@ async function main() {
     const erc20 = erc20Factory.attach(tokens[0])
 
 
-    //const savingAccounts = await ElDoradoSavingAccounts.attach('0x417558C27f04CEe2eA740723773f12b5C6764534')
-    console.log('deploying')
-
-    const savingAccounts = await ElDoradoSavingAccounts.deploy({
-        gasPrice: gasPrice
-    })
-    await savingAccounts.deployed()
+    const savingAccounts = await ElDoradoSavingAccounts.attach('0xb5885cF506A0dC37d07218BF2d648F7eB916dB23')
+    // console.log('deploying')
+    // const savingAccounts = await ElDoradoSavingAccounts.deploy({ gasPrice: gasPrice })
+    // await savingAccounts.deployed()
     console.log('savingAccounts', savingAccounts.address)
 
 
-    const mstableProvider = await MStableProvider.attach('0xEb14a277074Ed0b32BFA9132046c6F854Dda33B8')
+    const mstableProvider = await MStableProvider.attach('0x2a6D72a77ADb7ea5917caC048647d8D3a972005c')
     // const mstableProvider = await MStableProvider.deploy(
     //     MAssetAddress, //MAsset, 
     //     "0x300e56938454A4d8005B2e84eefFca002B3a24Bc", //ISavingsContract
@@ -46,20 +43,20 @@ async function main() {
     console.log('mstableProvider', mstableProvider.address)
 
 
-    console.log('approving..')
+    //console.log('approving..')
     /// TODO: IN a better way, and dynamic
-    const approved = await erc20.approve(mstableProvider.address, '10000000000000000000000000000', { gasPrice: gasPrice })
+    //const approved = await erc20.approve(mstableProvider.address, '10000000000000000000000000000', { gasPrice: gasPrice })
  
-    for (let i = 0; i < tokens.length; i++) {
-        console.log('adding provider-token', tokens[i])
-        const provider = await savingAccounts.addProvider(mstableProvider.address, tokens[i], { gasPrice: gasPrice, gasLimit: 200000 })
-        await provider.wait()
-    }
+    // for (let i = 0; i < tokens.length; i++) {
+    //     console.log('adding provider-token', tokens[i])
+    //     const provider = await savingAccounts.addProvider(mstableProvider.address, tokens[i], { gasPrice: gasPrice, gasLimit: 200000 })
+    //     await provider.wait()
+    // }
 
     const printBalances = async () => {
         const tasks = [
             erc20.balanceOf(signerAddress),
-            savingAccounts.getBalance()
+            savingAccounts.getBalance(tokens[0])
         ]
         const [erc20Balance, savings] = await Promise.all(tasks)
 
@@ -84,7 +81,8 @@ async function main() {
     console.log('');     await printBalances();   console.log('');
 
     console.log('withdrawOn')
-    const withdraw = await savingAccounts.withdrawOn(tokens[0], '10000000000000000', {
+    const balance = await savingAccounts.getBalance(tokens[0])
+    const withdraw = await savingAccounts.withdrawOn(tokens[0], balance, {
         gasLimit: '1000000',
         gasPrice: gasPrice
     })
