@@ -11,12 +11,12 @@ export function AsyncButton({ onClick, disabled, children }: AsyncButtonProps) {
     const [processing, setProcessing] = useState<boolean>(false)
     if (processing) {
         return (
-            <button style={{ width: '9rem' }} >
+            <button style={{ minWidth: '9rem' }} >
                 <div className="lds-facebook"><div></div><div></div><div></div></div>
             </button>
         );
     }
-    return <button style={{ width: '9rem' }} disabled={disabled || processing} onClick={async () => {
+    return <button style={{ minWidth: '9rem' }} disabled={disabled || processing} onClick={async () => {
         setProcessing(true)
         const result = onClick()
         if (result instanceof Promise) {

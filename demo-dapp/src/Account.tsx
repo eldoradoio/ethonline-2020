@@ -13,11 +13,10 @@ const FORMATTED_DECIMALS = 2
 const toBigNumber = (value: any, to: number) => {
     const decimals = Math.pow(10, FORMATTED_DECIMALS)
     let base = ((typeof value =='number') ? value : (typeof value ==='string' ? parseFloat(value) : BigNumber.from(value).toNumber()) )
-    base =  base * decimals 
-    debugger;
+    base =   base * decimals
 
     const by = BigNumber.from('1' + ''.padEnd(to - FORMATTED_DECIMALS, '0'))
-    return BigNumber.from(base).mul(by)
+    return BigNumber.from(base.toFixed(0)).mul(by)
 
 }
 
@@ -164,11 +163,11 @@ export function Balance({ tokenName, balance }: BalanceProps) {
     }
 
     return (
-        <span style={{ display: 'flex', flexGrow: 1, flexBasis: '1rem' }}>
+        <span style={{ display: 'flex', flexGrow: 1, flexBasis: '1rem', verticalAlign: 'middle', lineHeight: '3.5rem' }}>
             <span style={{ flexGrow: 4, textAlign: 'right' }}>
                 {balance ? formatTokenBalance(balance) : ''}
             </span>
-            <span style={{ width: '5rem', textAlign: 'left', paddingLeft: '1rem' }}>
+            <span style={{ width: '6rem', textAlign: 'left', paddingLeft: '1rem', fontSize: '1rem' }}>
                 {tokenName.toLocaleUpperCase()}
             </span>
         </span>

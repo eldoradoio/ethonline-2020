@@ -30,7 +30,7 @@ export function getBalance(): Promise<BigNumber> {
 }
 
 export async function getAccounts(): Promise<string[]> {
-    return ['0xb5e5d0f8c0cba267cd3d7035d6adc8eba7df7cdd'] //these should come from the contract
+    return ['0xb5e5d0f8c0cba267cd3d7035d6adc8eba7df7cdd', '0xb404c51bbc10dcbe948077f18a4b8e553d160084'] //these should come from the contract
 }
 
 export async function getTokenName(tokenAddress: string): Promise<string> {
