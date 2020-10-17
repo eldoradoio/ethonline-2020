@@ -72,7 +72,7 @@ type ToastProps = {
 
 export function Toast({ data, children, index }: ToastProps) {
     const { dispatcher } = useContext(MessagingContext)
-    const ago = Date.now() - data.timestamp
+    const ago = (Date.now() - data.timestamp) / 1000
     const closeMessage = () => {
         dispatcher({ type: ActionTypes.REMOVE_MESSAGE, index: index })
     }

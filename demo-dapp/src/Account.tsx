@@ -1,6 +1,6 @@
 import React, { Props, useContext, useEffect, useState } from 'react'
 import { BigNumber } from 'ethers';
-import { approve, deposit, getTokenBalance, getTokenName, TokenBalance, withdraw } from './accounts';
+import { approve, deposit, getTokenBalance, getTokenName, getTransactionResult, TokenBalance, withdraw } from './accounts';
 import { AsyncButton } from './AsyncButton';
 import { ActionTypes, MessagingContext } from './Messages';
 
@@ -42,9 +42,21 @@ export function Account({ tokenAddress, }: AccountProps) {
             })
 
         } catch (ex) {
+            debugger;
+            let message = ex
+            if (ex.transactionHash) {
+                message = await getTransactionResult(ex.transactionHash)
+            }
+            else if (ex.message) {
+                message = ex.message
+            }
+            else {
+                message = "Unhandled error"
+            }
+
             messaging.dispatcher({
                 message: {
-                    body: ex.toString(),
+                    body: message,
                     timestamp: Date.now(),
                     type: 'error'
                 },
@@ -74,7 +86,7 @@ export function Account({ tokenAddress, }: AccountProps) {
                                 <AsyncButton
                                     key={tokenAddress}
                                     disabled={amount ? false : true}
-                                    onClick={() => amount ? tryCall(()=>deposit(tokenAddress, amount), "Deposit succeeded!") : undefined}
+                                    onClick={() => amount ? tryCall(() => deposit(tokenAddress, amount), "Deposit succeeded!") : undefined}
                                 >
                                     Deposit
                                 </AsyncButton>

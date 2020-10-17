@@ -73,6 +73,23 @@ export async function withdraw(tokenAddress: string, amount: BigNumber): Promise
     await tx.wait()
 }
 
+function hex_to_ascii(str1: string) {
+	var hex  = str1.toString();
+	var str = '';
+	for (var n = 0; n < hex.length; n += 2) {
+		str += String.fromCharCode(parseInt(hex.substr(n, 2), 16));
+	}
+	return str;
+ }
+
+
+export async function getTransactionResult(txHash: string){
+    const tx = await provider.getTransaction(txHash)
+    let code = await provider.call(tx, tx.blockNumber)
+    let reason = hex_to_ascii(code.substr(138))
+    return reason
+}
+
 export type TokenBalance = {
     balance: BigNumber
     decimals: number
