@@ -74,7 +74,7 @@ async function main() {
 
   console.log("MStableProvider deployed to:", mstableProviderAddress);
 
-  console.log('suggestMintAsset', (await mstableProvider.suggestMintAsset()));
+  //console.log('suggestMintAsset', (await mstableProvider.suggestMintAsset()));
 
   /**SENDER SETUP */
 

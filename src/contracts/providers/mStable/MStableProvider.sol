@@ -4,20 +4,24 @@ pragma solidity >=0.5.15;
 import "@mstable/protocol/contracts/interfaces/IMasset.sol";
 import "@mstable/protocol/contracts/interfaces/IMStableHelper.sol";
 import "@mstable/protocol/contracts/interfaces/ISavingsContract.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "../../IElDoradoSavingsProvider.sol";
 
-import "@nomiclabs/buidler/console.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/utils/EnumerableSet.sol";
+
+import "../../IElDoradoSavingsProvider.sol";
 
 //NOTE APY = ((amount now * 1e18 / amount then) - 1e18) * (secondsInYear / depositLengthInSeconds)
 
-/*is IElDoradoSavingsProvider*/
-contract MStableProvider {
+contract MStableProvider is IElDoradoSavingsProvider  {
+    
+    using EnumerableSet for EnumerableSet.AddressSet;
+
     IMasset private masset;
     ISavingsContract private savings;
     IERC20 private mUSD;
     IMStableHelper private helper;
-
+    
+    EnumerableSet.AddressSet private _tokens;
     // User > balance
     mapping(address => uint256) private depositedBalances;
     // User > credits
@@ -45,6 +49,9 @@ contract MStableProvider {
         token.approve(address(masset), uint256(-1));
         token.approve(address(savings), uint256(-1));
         mUSD.approve(address(savings), uint256(-1));
+
+        _tokens.add(_tokenAddress);
+
         return true;
     }
 
@@ -169,8 +176,22 @@ contract MStableProvider {
     }
 
 
-    function getListOfDepositableTokens() external view returns(address[] memory);
-    function getListOfWithdrawableTokens() external view returns(address[] memory);
+    function getListOfDepositableTokens() external view returns(address[] memory){
+        return _getTokens();
+    }
+
+    function getListOfWithdrawableTokens() external view returns(address[] memory){
+        return _getTokens();
+    }
+
+    function _getTokens() private view returns (address[] memory) {
+        uint256 size = _tokens.length();
+        address[] memory result = new address[](size);
+        for (uint256 i = 0; i < size; i++) {
+            result[i] = _tokens.get(i);
+        }
+        return result;
+    }
     // function creditBalances(address) external view returns (uint256);
 
 
