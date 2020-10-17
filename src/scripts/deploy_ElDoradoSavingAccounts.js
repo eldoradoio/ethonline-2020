@@ -19,33 +19,25 @@ async function main() {
 
 
     const ElDoradoSavingAccounts = await ethers.getContractFactory("ElDoradoSavingAccounts")
+    const IElDoradoSavingsProvider = await ethers.getContractFactory("IElDoradoSavingsProvider")
     const MStableProvider = await ethers.getContractFactory("MStableProvider")
     const erc20Factory = await ethers.getContractFactory("ERC20");
     const erc20 = erc20Factory.attach(tokens[0])
 
 
-    const savingAccounts = await ElDoradoSavingAccounts.attach('0xb5885cF506A0dC37d07218BF2d648F7eB916dB23')
-    // console.log('deploying')
-    // const savingAccounts = await ElDoradoSavingAccounts.deploy({ gasPrice: gasPrice })
-    // await savingAccounts.deployed()
+    //const savingAccounts = await ElDoradoSavingAccounts.attach('0xb5885cF506A0dC37d07218BF2d648F7eB916dB23')
+    console.log('deploying')
+    const savingAccounts = await ElDoradoSavingAccounts.deploy({ gasPrice: gasPrice })
+    await savingAccounts.deployed()
     console.log('savingAccounts', savingAccounts.address)
 
 
-    //const mstableProvider = await MStableProvider.attach('0x2a6D72a77ADb7ea5917caC048647d8D3a972005c')
-    const mstableProvider = await MStableProvider.deploy(
-        MAssetAddress, //MAsset, 
-        "0x300e56938454A4d8005B2e84eefFca002B3a24Bc", //ISavingsContract
-        "0x1c0de4e659e76d3c876813ff2ba9dc2da07ab658", //Helper
-        {
-            gasPrice: gasPrice
-        }
-    )    
-    await mstableProvider.deployed()
+    const mstableProvider = await MStableProvider.attach('0x32cd2dF6ed5C3DEFA3FC994Bf8E858F6Bb9fadEB')
     console.log('mstableProvider', mstableProvider.address)
 
 
     console.log('approving..')
-    // TODO: IN a better way, and dynamic
+    // TODO: Get provider list and do this
     const approved = await erc20.approve(mstableProvider.address, '10000000000000000000000000000', { gasPrice: gasPrice })
  
     for (let i = 0; i < tokens.length; i++) {
@@ -64,12 +56,19 @@ async function main() {
         //console.clear();
         console.log('* User ERC20 balance', erc20Balance.toString())
         console.log('* Savings balance', savings.toString())
+        
         //return earntOf
     }
 
     console.log('');     await printBalances();   console.log('');
 
-    console.log('depositOn')
+    console.log('depositOn provider:')
+    const providerAddress = await savingAccounts.getProviderByToken(tokens[0])
+    const savingsProvider =  IElDoradoSavingsProvider.attach(providerAddress)
+    console.log('Id', await savingsProvider.getProviderId())
+    console.log('Name', await savingsProvider.getProviderName())
+    console.log('Version', await savingsProvider.getProviderVersion())
+   
     const deposit = await savingAccounts.depositOn(tokens[0], '10000000000000000', {
         gasLimit: '1000000',
         gasPrice: gasPrice

@@ -17,7 +17,7 @@ const provider = new ethers.providers.Web3Provider(portis.provider)
 const signer = provider.getSigner()
 
 
-const accounts = ElDoradoSavingAccountsFactory.connect('0xb5885cF506A0dC37d07218BF2d648F7eB916dB23', signer)
+const accounts = ElDoradoSavingAccountsFactory.connect('0x6Fb4026895de9eB79044ecaCCEf99168B49cF13C', signer)
 
 
 export async function getConnectedAddress(): Promise<string> {
@@ -112,7 +112,7 @@ export type TokenBalance = {
 
 export async function getProvidersAddressList() {
     const providersCount = await accounts.providersCount()
-    const providersTasks = new Array(providersCount.toNumber()).map((x, i) => accounts.getProviderByIndex(i))
+    const providersTasks = Array.from({ length: providersCount.toNumber() }, (x, i) => accounts.getProviderByIndex(i))
     const providerAddresses = await Promise.all(providersTasks)
     return providerAddresses
 }
@@ -125,8 +125,8 @@ export type ProviderData = {
 
 export async function getProviderSavingsBalance(providerAddress: string): Promise<ProviderData> {
     const savingProvider = IElDoradoSavingsProviderFactory.connect(providerAddress, provider);
-    const id = await savingProvider.getProviderId()
     const name = await savingProvider.getProviderName()
+    const id = await savingProvider.getProviderId()
     //const balance = await accounts.getBalance()
 
     return {
@@ -135,9 +135,8 @@ export async function getProviderSavingsBalance(providerAddress: string): Promis
     }
 }
 
-export async function getAllProviders(){
+export async function getAllProviders() {
     const addresses = await getProvidersAddressList();
-    console.log(addresses)
-    //const providers = await Promise.all(addresses.map(getProviderSavingsBalance))
-    return []
+    const providers = await Promise.all(addresses.map(getProviderSavingsBalance))
+    return providers
 }
