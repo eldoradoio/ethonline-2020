@@ -107,3 +107,21 @@ export type TokenBalance = {
     decimals: number
     allowance: BigNumber
 }
+
+export async function getProvidersAddressList(){
+    const providersCount = await accounts.providersCount()
+    const providersTasks = new Array(providersCount.toNumber()).map((x, i)=> accounts.getProviderByIndex(i) )
+    const providerAddresses = await Promise.all(providersTasks)
+    return providerAddresses
+}
+
+export async function getProviderSavingsBalance(providerAddress: string): Promise<TokenBalance> {
+    //const savingsProvider = await accounts.getProviderByToken(tokenAddress)
+    const balance = await accounts.getBalance()
+
+    return {
+        balance: await balance,
+        decimals: 18,
+        allowance: BigNumber.from('1')
+    }
+}
