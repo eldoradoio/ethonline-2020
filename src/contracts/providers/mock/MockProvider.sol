@@ -104,10 +104,22 @@ contract MockProvider is IElDoradoSavingsProvider {
 
     function _getTokens() private view returns (address[] memory) {
         uint256 size = _tokens.length();
-        address[] memory result = new address[](size) ;
+        address[] memory result = new address[](size);
         for (uint256 i = 0; i < size; i++) {
             result[i] = _tokens.get(i);
         }
         return result;
+    }
+
+    function getProviderId() external view returns (bytes32){
+        return keccak256('MOCK');
+    }
+
+    function getProviderVersion() external view returns (uint256){
+        return 1;
+    }
+
+    function getProviderName() external view returns (string memory){
+        return "Mock Provider";
     }
 }

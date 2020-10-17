@@ -1,25 +1,31 @@
 import { BigNumber } from "ethers";
 import React, { useEffect, useState } from "react";
 import { Account } from "./Account";
-import { getAccounts, getBalance } from "./accounts";
+import { getAccounts, getAllProviders, ProviderData } from "./accounts";
 
 type ConnectedProps = {
     address: string
 }
 
 export function Connected({ address }: ConnectedProps) {
-    const [balance, setBalance] = useState<BigNumber>()
+    const [providers, setProviders] = useState<ProviderData[]>([])
     const [accounts, setAccounts] = useState<string[]>()
 
 
     useEffect(() => {
         console.log('effect')
-        getBalance().then(setBalance)
-        getAccounts().then(setAccounts)
+        getAllProviders().then(setProviders)
+        //getAccounts().then(setAccounts)
     }, [address])
 
     const accountItems = accounts?.map(x => {
         return (<Account key={x} tokenAddress={x} ></Account>)
+    })
+
+    const depositable = providers.map(x=>{
+        return (
+            <div>{x.name}</div>
+        )
     })
 
     const formatAddress = (address: string) => {
@@ -30,6 +36,9 @@ export function Connected({ address }: ConnectedProps) {
         <h4>
             Connected with: {formatAddress(address)}
         </h4>
+        <section>
+            {depositable}
+        </section>
         <section style={{ width: '80%', maxWidth: '50rem' }}>
             {accountItems}
         </section>

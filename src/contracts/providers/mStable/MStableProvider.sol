@@ -18,7 +18,9 @@ contract MStableProvider {
     IERC20 private mUSD;
     IMStableHelper private helper;
 
+    // User > balance
     mapping(address => uint256) private depositedBalances;
+    // User > credits
     mapping(address => uint256) private creditBalances;
 
     uint256 private totalDeposited;
@@ -166,5 +168,19 @@ contract MStableProvider {
         return depositedBalances[account];
     }
 
+
+    function getListOfDepositableTokens() external view returns(address[] memory);
+    function getListOfWithdrawableTokens() external view returns(address[] memory);
     // function creditBalances(address) external view returns (uint256);
+
+
+    function getProviderId() external view returns (bytes32) {
+        return keccak256('MSTABLE');
+    }
+    function getProviderVersion() external view returns (uint256){
+        return 1;
+    }
+    function getProviderName() external view returns (string memory){
+        return "mStable";
+    }
 }

@@ -6,6 +6,8 @@ import Web3 from 'web3';
 
 
 import { ElDoradoSavingAccountsFactory } from '../assets/types/ElDoradoSavingAccountsFactory'
+import { IElDoradoSavingsProviderFactory } from '../assets/types/IElDoradoSavingsProviderFactory';
+
 import { Erc20DetailedFactory } from '../assets/types/Erc20DetailedFactory'
 
 const network = 'ropsten'
@@ -15,7 +17,7 @@ const provider = new ethers.providers.Web3Provider(portis.provider)
 const signer = provider.getSigner()
 
 
-const accounts = ElDoradoSavingAccountsFactory.connect('0xc9E3E339f3FCe60fafD35aC6b73CEeE1A4D3Ba88', signer)
+const accounts = ElDoradoSavingAccountsFactory.connect('0xb5885cF506A0dC37d07218BF2d648F7eB916dB23', signer)
 
 
 export async function getConnectedAddress(): Promise<string> {
@@ -24,9 +26,9 @@ export async function getConnectedAddress(): Promise<string> {
     return address
 }
 
-export function getBalance(): Promise<BigNumber> {
+export function getBalance(tokenAddress: string): Promise<BigNumber> {
     //getEarnings
-    return accounts.getBalance()
+    return accounts.getBalance(tokenAddress)
 }
 
 export async function getAccounts(): Promise<string[]> {
@@ -52,7 +54,7 @@ export async function getTokenBalance(tokenAddress: string): Promise<TokenBalanc
 
 export async function getTokenSavingsBalance(tokenAddress: string): Promise<TokenBalance> {
     //const savingsProvider = await accounts.getProviderByToken(tokenAddress)
-    const balance = await accounts.getBalance()
+    const balance = await accounts.getBalance(tokenAddress)
 
     return {
         balance: await balance,
@@ -86,16 +88,16 @@ export async function withdraw(tokenAddress: string, amount: BigNumber): Promise
 }
 
 function hex_to_ascii(str1: string) {
-	var hex  = str1.toString();
-	var str = '';
-	for (var n = 0; n < hex.length; n += 2) {
-		str += String.fromCharCode(parseInt(hex.substr(n, 2), 16));
-	}
-	return str;
- }
+    var hex = str1.toString();
+    var str = '';
+    for (var n = 0; n < hex.length; n += 2) {
+        str += String.fromCharCode(parseInt(hex.substr(n, 2), 16));
+    }
+    return str;
+}
 
 
-export async function getTransactionResult(txHash: string){
+export async function getTransactionResult(txHash: string) {
     const tx = await provider.getTransaction(txHash)
     let code = await provider.call(tx, tx.blockNumber)
     let reason = hex_to_ascii(code.substr(138))
@@ -108,20 +110,34 @@ export type TokenBalance = {
     allowance: BigNumber
 }
 
-export async function getProvidersAddressList(){
+export async function getProvidersAddressList() {
     const providersCount = await accounts.providersCount()
-    const providersTasks = new Array(providersCount.toNumber()).map((x, i)=> accounts.getProviderByIndex(i) )
+    const providersTasks = new Array(providersCount.toNumber()).map((x, i) => accounts.getProviderByIndex(i))
     const providerAddresses = await Promise.all(providersTasks)
     return providerAddresses
 }
 
-export async function getProviderSavingsBalance(providerAddress: string): Promise<TokenBalance> {
-    //const savingsProvider = await accounts.getProviderByToken(tokenAddress)
-    const balance = await accounts.getBalance()
+export type ProviderData = {
+    id: string
+    //version: string
+    name: string
+}
+
+export async function getProviderSavingsBalance(providerAddress: string): Promise<ProviderData> {
+    const savingProvider = IElDoradoSavingsProviderFactory.connect(providerAddress, provider);
+    const id = await savingProvider.getProviderId()
+    const name = await savingProvider.getProviderName()
+    //const balance = await accounts.getBalance()
 
     return {
-        balance: await balance,
-        decimals: 18,
-        allowance: BigNumber.from('1')
+        id: id,
+        name: name
     }
+}
+
+export async function getAllProviders(){
+    const addresses = await getProvidersAddressList();
+    console.log(addresses)
+    //const providers = await Promise.all(addresses.map(getProviderSavingsBalance))
+    return []
 }

@@ -2,6 +2,10 @@
 pragma solidity >=0.5.15;
 
 interface IElDoradoSavingsProvider {
+
+    function getProviderId() external view returns (bytes32);
+    function getProviderVersion() external view returns (uint256);
+    function getProviderName() external view returns (string memory);
   
     function deposit(address _account, address _tokenAddress, uint256 _amount) external returns(uint256);
     function withdraw(address _account, address _tokenAddress, uint256 _amount) external returns(uint256);

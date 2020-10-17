@@ -6,6 +6,7 @@ async function main() {
         '0xb5e5d0f8c0cba267cd3d7035d6adc8eba7df7cdd', //'DAI-MSTABLE'
         //'0x8a9447df1fb47209d36204e6d56767a33bf20f9f', // 'USDC-MSTABLE'
     ]
+    const MAssetAddress = "0x4E1000616990D83e56f4b5fC6CC8602DcfD20459" //MAsset
 
 
 
