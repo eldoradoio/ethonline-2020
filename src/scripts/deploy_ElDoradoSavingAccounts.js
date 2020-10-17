@@ -30,28 +30,28 @@ async function main() {
     console.log('savingAccounts', savingAccounts.address)
 
 
-    const mstableProvider = await MStableProvider.attach('0x2a6D72a77ADb7ea5917caC048647d8D3a972005c')
-    // const mstableProvider = await MStableProvider.deploy(
-    //     MAssetAddress, //MAsset, 
-    //     "0x300e56938454A4d8005B2e84eefFca002B3a24Bc", //ISavingsContract
-    //     "0x1c0de4e659e76d3c876813ff2ba9dc2da07ab658", //Helper
-    //     {
-    //         gasPrice: gasPrice
-    //     }
-    // )    
-    // await mstableProvider.deployed()
+    //const mstableProvider = await MStableProvider.attach('0x2a6D72a77ADb7ea5917caC048647d8D3a972005c')
+    const mstableProvider = await MStableProvider.deploy(
+        MAssetAddress, //MAsset, 
+        "0x300e56938454A4d8005B2e84eefFca002B3a24Bc", //ISavingsContract
+        "0x1c0de4e659e76d3c876813ff2ba9dc2da07ab658", //Helper
+        {
+            gasPrice: gasPrice
+        }
+    )    
+    await mstableProvider.deployed()
     console.log('mstableProvider', mstableProvider.address)
 
 
-    //console.log('approving..')
-    /// TODO: IN a better way, and dynamic
-    //const approved = await erc20.approve(mstableProvider.address, '10000000000000000000000000000', { gasPrice: gasPrice })
+    console.log('approving..')
+    // TODO: IN a better way, and dynamic
+    const approved = await erc20.approve(mstableProvider.address, '10000000000000000000000000000', { gasPrice: gasPrice })
  
-    // for (let i = 0; i < tokens.length; i++) {
-    //     console.log('adding provider-token', tokens[i])
-    //     const provider = await savingAccounts.addProvider(mstableProvider.address, tokens[i], { gasPrice: gasPrice, gasLimit: 200000 })
-    //     await provider.wait()
-    // }
+    for (let i = 0; i < tokens.length; i++) {
+        console.log('adding provider-token', tokens[i])
+        const provider = await savingAccounts.addProvider(mstableProvider.address, tokens[i], { gasPrice: gasPrice, gasLimit: 200000 })
+        await provider.wait()
+    }
 
     const printBalances = async () => {
         const tasks = [
