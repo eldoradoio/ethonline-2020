@@ -1,6 +1,6 @@
 import React, { Props, useContext, useEffect, useState } from 'react'
 import { BigNumber } from 'ethers';
-import { approve, deposit, getTokenBalance, getTokenName, getTransactionResult, TokenBalance, withdraw } from './accounts';
+import { approve, deposit, getTokenBalance, getTokenName, getTokenSavingsBalance, getTransactionResult, TokenBalance, withdraw } from './accounts';
 import { AsyncButton } from './AsyncButton';
 import { ActionTypes, MessagingContext } from './Messages';
 
@@ -8,26 +8,22 @@ type AccountProps = {
     tokenAddress: string
 }
 export function Account({ tokenAddress, }: AccountProps) {
-    const [amount, setAmount] = useState<BigNumber>();
-
     const [tokenName, setTokenName] = useState<string>('---')
+
+    const [depositAmount, setDepositAmount] = useState<BigNumber>();
+    const [withdrawAmount, setWithdrawAmount] = useState<BigNumber>();
+
     const [tokenBalance, setTokenBalance] = useState<TokenBalance>()
+    const [tokenSavingsBalance, setTokenSavingsBalance] = useState<TokenBalance>()
+
 
     const messaging = useContext(MessagingContext)
 
     useEffect(() => {
         getTokenName(tokenAddress).then(setTokenName)
         getTokenBalance(tokenAddress).then(setTokenBalance)
+        getTokenSavingsBalance(tokenAddress).then(setTokenSavingsBalance)
     }, [tokenAddress, messaging.state.length])
-
-    const formatTokenBalance = (tb: TokenBalance): string => {
-        //TODO: import a better bignumber than the ethersjs one.. w(ﾟДﾟ)w
-        const formattedDecimals = 2
-        const decimals = Math.pow(10, formattedDecimals)
-        const by = BigNumber.from('1' + ''.padEnd(tb.decimals - formattedDecimals, '0'))
-
-        return (tb.balance.div(by).toNumber() / decimals).toFixed(formattedDecimals)
-    }
 
     const tryCall = async (action: Function, sucessMessage: string) => {
         try {
@@ -66,54 +62,98 @@ export function Account({ tokenAddress, }: AccountProps) {
     }
 
     return (
-        <div style={{ display: 'flex' }}>
-            <span style={{ flexGrow: 1 }}>{tokenName}: {tokenBalance ? formatTokenBalance(tokenBalance) : ''}</span>
-            <span style={{ flexGrow: 1 }}>
-                {tokenBalance?.allowance.gt('0') ?
-                    (
-                        <React.Fragment>
-                            <span>
-                                <input onChange={(x) => {
-                                    try {
-                                        setAmount(BigNumber.from(x.target.value))
+        <div>
+            <div style={{ display: 'flex' }}>
+                <Balance tokenName={tokenName} balance={tokenBalance}></Balance>
+                <span style={{ flexGrow: 2, flexBasis: '1rem', display:'flex' }}>
+                    {tokenBalance?.allowance.gt('0') ?
+                        (
+                            <React.Fragment>
+                                <span style={{ flexGrow: 1, display:"flex"  }}>
+                                    <input style={{ flexGrow: 1}} onChange={(x) => {
+                                        try {
+                                            setDepositAmount(BigNumber.from(x.target.value))
 
-                                    } catch {
-                                        setAmount(undefined)
-                                    }
-                                }}></input>
-                            </span>
-                            <span>
-                                <AsyncButton
-                                    key={tokenAddress}
-                                    disabled={amount ? false : true}
-                                    onClick={() => amount ? tryCall(() => deposit(tokenAddress, amount), "Deposit succeeded!") : undefined}
-                                >
-                                    Deposit
+                                        } catch {
+                                            setDepositAmount(undefined)
+                                        }
+                                    }}></input>
+                                </span>
+                                <span>
+                                    <AsyncButton
+                                        key={tokenAddress}
+                                        disabled={depositAmount ? false : true}
+                                        onClick={() => depositAmount ? tryCall(() => deposit(tokenAddress, depositAmount), "Deposit succeeded!") : undefined}
+                                    >
+                                        Deposit
                                 </AsyncButton>
-                            </span>
-                            <span>
-                                <AsyncButton
-                                    key={tokenAddress}
-                                    disabled={amount ? false : true}
-                                    onClick={() => amount ? tryCall(() => withdraw(tokenAddress, amount), "Withdraw completed!") : undefined}
-                                >
-                                    Withdraw
-                                </AsyncButton>
-                            </span>
-                        </React.Fragment>
-                    )
-                    :
-                    (<AsyncButton
-                        key={tokenAddress}
-                        disabled={false}
-                        onClick={() => tryCall(() => approve(tokenAddress), "Use of tokens approved")}
-                    >
-                        Approve use of tokens
-                    </AsyncButton>)
-                }
+                                </span>
+                            </React.Fragment>
+                        )
+                        :
+                        (<AsyncButton
+                            key={tokenAddress}
+                            disabled={false}
+                            onClick={() => tryCall(() => approve(tokenAddress), "Use of tokens approved")}
+                        >
+                            Approve use of tokens
+                        </AsyncButton>)
+                    }
 
-            </span>
-        </div>)
+                </span>
+            </div>
+            <div style={{ display: 'flex', marginTop: '0.5rem' }}>
+                <Balance tokenName={tokenName} balance={tokenSavingsBalance}></Balance>
+                <span style={{ flexGrow: 2, flexBasis: '1rem', display:'flex' }}>
+                    <React.Fragment>
+                        <span style={{ flexGrow: 1, display:"flex" }}>
+                            <input style={{ flexGrow: 1 }} onChange={(x) => {
+                                try {
+                                    setWithdrawAmount(BigNumber.from(x.target.value))
+
+                                } catch {
+                                    setWithdrawAmount(undefined)
+                                }
+                            }}></input>
+                        </span>
+                        <span>
+                            <AsyncButton
+                                key={tokenAddress}
+                                disabled={withdrawAmount ? false : true}
+                                onClick={() => withdrawAmount ? tryCall(() => withdraw(tokenAddress, withdrawAmount), "Withdraw completed!") : undefined}
+                            >
+                                Withdraw
+                                    </AsyncButton>
+                        </span>
+                    </React.Fragment>
+                </span>
+            </div>
+        </div>
+    )
 }
 
-//approve(tokenAddress)
+export type BalanceProps = {
+    tokenName: string
+    balance?: TokenBalance
+}
+export function Balance({ tokenName, balance }: BalanceProps) {
+    const formatTokenBalance = (tb: TokenBalance): string => {
+        //TODO: import a better bignumber than the ethersjs one.. w(ﾟДﾟ)w
+        const formattedDecimals = 2
+        const decimals = Math.pow(10, formattedDecimals)
+        const by = BigNumber.from('1' + ''.padEnd(tb.decimals - formattedDecimals, '0'))
+
+        return (tb.balance.div(by).toNumber() / decimals).toFixed(formattedDecimals)
+    }
+
+    return (
+        <span style={{ display: 'flex', flexGrow: 1, flexBasis: '1rem' }}>
+            <span style={{ flexGrow: 4, textAlign: 'right' }}>
+                {balance ? formatTokenBalance(balance) : ''}
+            </span>
+            <span style={{ width: '5rem', textAlign: 'left', paddingLeft: '1rem' }}>
+                {tokenName.toLocaleUpperCase()}
+            </span>
+        </span>
+    )
+}

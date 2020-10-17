@@ -50,6 +50,17 @@ export async function getTokenBalance(tokenAddress: string): Promise<TokenBalanc
     }
 }
 
+export async function getTokenSavingsBalance(tokenAddress: string): Promise<TokenBalance> {
+    //const savingsProvider = await accounts.getProviderByToken(tokenAddress)
+    const balance = await accounts.getBalance()
+
+    return {
+        balance: await balance,
+        decimals: 18,
+        allowance: BigNumber.from('1')
+    }
+}
+
 export async function approve(tokenAddress: string): Promise<void> {
     const erc20 = Erc20DetailedFactory.connect(tokenAddress, signer)
     const savingsProvider = await accounts.getProviderByToken(tokenAddress)

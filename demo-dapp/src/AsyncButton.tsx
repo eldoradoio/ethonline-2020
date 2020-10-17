@@ -9,7 +9,7 @@ type AsyncButtonProps = {
 
 export function AsyncButton({ onClick, disabled, children }: AsyncButtonProps) {
     const [processing, setProcessing] = useState<boolean>(false)
-    return <button disabled={disabled || processing} onClick={async () => {
+    return <button style={{ width: '9rem'}} disabled={disabled || processing} onClick={async () => {
         setProcessing(true)
         const result = onClick()
         if (result instanceof Promise) {

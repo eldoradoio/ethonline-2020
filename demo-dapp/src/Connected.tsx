@@ -30,9 +30,6 @@ export function Connected({ address }: ConnectedProps) {
         <h4>
             Connected with: {formatAddress(address)}
         </h4>
-        <p>
-            Savings Balance: {balance?.toString()}
-        </p>
         <section style={{ width: '80%', maxWidth: '50rem' }}>
             {accountItems}
         </section>
