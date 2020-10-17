@@ -17,6 +17,7 @@ describe("ElDoradoSavingAccounts", function () {
     await savingAccounts.addProvider(mockProvider.address, erc20.address);
 
     expect(await savingAccounts.providersCount()).to.equal(1);
+
   });
 
   it("Should allow anyone to deposit tokens on a specific provider", async function () {
@@ -31,13 +32,16 @@ describe("ElDoradoSavingAccounts", function () {
 
     await savingAccounts.addProvider(mockProvider.address, erc20.address);
 
-    expect(await savingAccounts.getBalance()).to.equal('0')
+    expect(await savingAccounts.getBalance(erc20.address)).to.equal('0')
 
-    await savingAccounts.depositAt(erc20.address, '100')
-    expect(await savingAccounts.getBalance()).to.equal('100')
+    await savingAccounts.depositOn(erc20.address, '100')
+    expect(await savingAccounts.getBalance(erc20.address)).to.equal('100')
 
-    await savingAccounts.depositAt(erc20.address, '150')
-    expect(await savingAccounts.getBalance()).to.equal('250')
+    await savingAccounts.depositOn(erc20.address, '150')
+    expect(await savingAccounts.getBalance(erc20.address)).to.equal('250')
+
+    expect((await mockProvider.getListOfDepositableTokens()).length).to.equal(1);
+    expect((await mockProvider.getListOfWithdrawableTokens()).length).to.equal(1);
 
   })
 
@@ -57,16 +61,20 @@ describe("ElDoradoSavingAccounts", function () {
     await erc20_1.mint(userAddress, '100000000')
     await erc20_2.mint(userAddress, '100000000')
 
-    expect(await savingAccounts.getEarnings()).to.equal('0');
+    expect(await savingAccounts.getEarnings(erc20_1.address)).to.equal('0');
+    expect(await savingAccounts.getEarnings(erc20_2.address)).to.equal('0');
 
-    await savingAccounts.depositAt(erc20_1.address, '1000')
-    await savingAccounts.depositAt(erc20_2.address, '2000')
+    await savingAccounts.depositOn(erc20_1.address, '1000')
+    await savingAccounts.depositOn(erc20_2.address, '2000')
 
     //SIMULATE TIME
     await mockProvider_1.simulate();
 
-    expect(await savingAccounts.getEarnings()).to.gt('3000');
+    expect(await savingAccounts.getEarnings(erc20_1.address)).to.gt('1000');
+    expect(await savingAccounts.getEarnings(erc20_2.address)).to.gt('2000');
 
+    expect((await mockProvider_1.getListOfDepositableTokens()).length).to.equal(1);
+    expect((await mockProvider_2.getListOfDepositableTokens()).length).to.equal(1);
 
   })
 

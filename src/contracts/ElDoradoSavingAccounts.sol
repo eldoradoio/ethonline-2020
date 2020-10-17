@@ -62,27 +62,24 @@ contract ElDoradoSavingAccounts
     return _withdraw(msg.sender, getProviderByToken(_tokenAddress), _tokenAddress,_amount);
   }
 
-  //TODO needs the provider address or token address
-  function getBalance() external view returns(uint256){
-     return _balanceOf(msg.sender);
+  function getBalance(address _tokenAddress) external view returns(uint256){
+     return _balanceOf(msg.sender, _tokenAddress);
   }
 
-  //TODO needs the provider address or token address
-  function balanceOf(address account) external view returns(uint256) {
-    return _balanceOf(account);
+  function balanceOf(address account, address _tokenAddress) external view returns(uint256) {
+    return _balanceOf(account, _tokenAddress);
   } 
 
-  //TODO needs the provider address or token address
-  function _balanceOf(address account) private view returns(uint256) {
-    return _balances[msg.sender];
+  function _balanceOf(address account, address _tokenAddress) private view returns(uint256) {
+    return IElDoradoSavingsProvider(getProviderByToken(_tokenAddress)).getBalance(msg.sender, _tokenAddress);
   } 
   
 
-  function getEarnings() external view returns(uint256){
+  function getEarnings(address _tokenAddress) external view returns(uint256){
     //This wont work, because it might be diferent denominations
     uint256 total = 0;
     for(uint256 i=0; i< _providers.length(); i++){
-        total += IElDoradoSavingsProvider(_providers.get(i)).getEarnings(msg.sender);
+        total += IElDoradoSavingsProvider(_providers.get(i)).getEarnings(msg.sender, _tokenAddress);
     }
     return total;
   }
