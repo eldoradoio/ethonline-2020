@@ -78,6 +78,7 @@ export async function deposit(tokenAddress: string, amount: BigNumber): Promise<
 
 
 export async function withdraw(tokenAddress: string, amount: BigNumber): Promise<void> {
+    console.log('withdrawing', amount)
     const tx = await accounts.withdrawOn(tokenAddress, amount, {
         gasLimit: 850000
     })

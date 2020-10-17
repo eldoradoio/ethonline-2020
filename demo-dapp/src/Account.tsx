@@ -7,6 +7,20 @@ import { ActionTypes, MessagingContext } from './Messages';
 type AccountProps = {
     tokenAddress: string
 }
+
+const FORMATTED_DECIMALS = 2
+
+const toBigNumber = (value: any, to: number) => {
+    const decimals = Math.pow(10, FORMATTED_DECIMALS)
+    let base = ((typeof value =='number') ? value : (typeof value ==='string' ? parseFloat(value) : BigNumber.from(value).toNumber()) )
+    base =  base * decimals 
+    debugger;
+
+    const by = BigNumber.from('1' + ''.padEnd(to - FORMATTED_DECIMALS, '0'))
+    return BigNumber.from(base).mul(by)
+
+}
+
 export function Account({ tokenAddress, }: AccountProps) {
     const [tokenName, setTokenName] = useState<string>('---')
 
@@ -32,7 +46,7 @@ export function Account({ tokenAddress, }: AccountProps) {
                 message: {
                     body: sucessMessage || "Action completed!",
                     timestamp: Date.now(),
-                    type: 'error'
+                    type: 'success'
                 },
                 type: ActionTypes.ADD_MESSAGE
             })
@@ -45,6 +59,9 @@ export function Account({ tokenAddress, }: AccountProps) {
             }
             else if (ex.message) {
                 message = ex.message
+            }
+            else if (typeof ex === 'string') {
+                message = ex
             }
             else {
                 message = "Unhandled error"
@@ -65,14 +82,14 @@ export function Account({ tokenAddress, }: AccountProps) {
         <div>
             <div style={{ display: 'flex' }}>
                 <Balance tokenName={tokenName} balance={tokenBalance}></Balance>
-                <span style={{ flexGrow: 2, flexBasis: '1rem', display:'flex' }}>
+                <span style={{ flexGrow: 2, flexBasis: '1rem', display: 'flex' }}>
                     {tokenBalance?.allowance.gt('0') ?
                         (
                             <React.Fragment>
-                                <span style={{ flexGrow: 1, display:"flex"  }}>
-                                    <input style={{ flexGrow: 1}} onChange={(x) => {
+                                <span style={{ flexGrow: 1, display: "flex" }}>
+                                    <input style={{ flexGrow: 1 }} onChange={(x) => {
                                         try {
-                                            setDepositAmount(BigNumber.from(x.target.value))
+                                            setDepositAmount(toBigNumber(x.target.value, 18))
 
                                         } catch {
                                             setDepositAmount(undefined)
@@ -104,12 +121,12 @@ export function Account({ tokenAddress, }: AccountProps) {
             </div>
             <div style={{ display: 'flex', marginTop: '0.5rem' }}>
                 <Balance tokenName={tokenName} balance={tokenSavingsBalance}></Balance>
-                <span style={{ flexGrow: 2, flexBasis: '1rem', display:'flex' }}>
+                <span style={{ flexGrow: 2, flexBasis: '1rem', display: 'flex' }}>
                     <React.Fragment>
-                        <span style={{ flexGrow: 1, display:"flex" }}>
+                        <span style={{ flexGrow: 1, display: "flex" }}>
                             <input style={{ flexGrow: 1 }} onChange={(x) => {
                                 try {
-                                    setWithdrawAmount(BigNumber.from(x.target.value))
+                                    setWithdrawAmount(toBigNumber(x.target.value, 18))
 
                                 } catch {
                                     setWithdrawAmount(undefined)
@@ -139,7 +156,7 @@ export type BalanceProps = {
 export function Balance({ tokenName, balance }: BalanceProps) {
     const formatTokenBalance = (tb: TokenBalance): string => {
         //TODO: import a better bignumber than the ethersjs one.. w(ﾟДﾟ)w
-        const formattedDecimals = 2
+        const formattedDecimals = FORMATTED_DECIMALS
         const decimals = Math.pow(10, formattedDecimals)
         const by = BigNumber.from('1' + ''.padEnd(tb.decimals - formattedDecimals, '0'))
 
