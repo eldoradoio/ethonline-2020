@@ -1,6 +1,6 @@
 import { BigNumber } from "ethers";
 import React, { useEffect, useState } from "react";
-import { Account } from "./Account";
+import { DepositAccount } from "./DepositAccount";
 import { getAccounts, getAllProviders, ProviderData } from "./accounts";
 import { DepositTap } from "./DepositTab";
 import { TabSwitch } from "./TabSwitch";
@@ -31,7 +31,7 @@ export function Connected({ address }: ConnectedProps) {
         </div>
         <TabSwitch labels={["Deposit", "Withdraw"]}>
             <DepositTap providers={providers}></DepositTap>
-            <WithdrawTab></WithdrawTab>
+            <WithdrawTab providers={providers}></WithdrawTab>
         </TabSwitch>
 
     </React.Fragment>)

@@ -1,0 +1,1 @@
+export const FORMATTED_DECIMALS = 2

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Account } from "./Account";
+import { DepositAccount } from "./DepositAccount";
 import { getAccounts, ProviderData } from "./accounts";
 
 type DepositTapProps = {
@@ -17,12 +17,11 @@ export function DepositTap({ providers }: DepositTapProps) {
 
     const depositable = providers.map(x => {
         const accountItems = x.depositable?.map(x => {
-            return (<Account key={x} tokenAddress={x} ></Account>)
+            return (<DepositAccount key={x} tokenAddress={x} ></DepositAccount>)
         })
 
         return (
-            <div>
-                <title>{x.name} </title>
+            <div className="provider">
                 <div style={{ width: '80%', maxWidth: '50rem' }}>
                     {accountItems}
                 </div>
