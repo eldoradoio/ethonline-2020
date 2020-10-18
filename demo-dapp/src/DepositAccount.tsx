@@ -1,13 +1,13 @@
 import React, { Props, useContext, useEffect, useState } from 'react'
 import { BigNumber } from 'ethers';
-import { approve, deposit, getTokenBalance, getTokenName, getTokenSavingsBalance, getTransactionResult, TokenBalance, withdraw } from './accounts';
+import { approve, deposit, getTokenBalance, getTokenName, getTokenSavingsBalance, getTransactionResult, TokenBalance, TokenData, withdraw } from './accounts';
 import { AsyncButton } from './AsyncButton';
 import { ActionTypes, MessagingContext } from './Messages';
 import { FORMATTED_DECIMALS } from './constants';
 import { Balance } from './Balance';
 
 type AccountProps = {
-    tokenAddress: string
+    token: TokenData
 }
 
 const toBigNumber = (value: any, to: number) => {
@@ -20,8 +20,9 @@ const toBigNumber = (value: any, to: number) => {
 
 }
 
-export function DepositAccount({ tokenAddress, }: AccountProps) {
-    const [tokenName, setTokenName] = useState<string>('---')
+export function DepositAccount({ token, }: AccountProps) {
+    const tokenAddress = token.address
+    const tokenName = token.name
 
     const [depositAmount, setDepositAmount] = useState<BigNumber>();
     const [withdrawAmount, setWithdrawAmount] = useState<BigNumber>();
@@ -33,7 +34,6 @@ export function DepositAccount({ tokenAddress, }: AccountProps) {
     const messaging = useContext(MessagingContext)
 
     useEffect(() => {
-        getTokenName(tokenAddress).then(setTokenName)
         getTokenBalance(tokenAddress).then(setTokenBalance)
         //getTokenSavingsBalance(tokenAddress).then(setTokenSavingsBalance)
     }, [tokenAddress, messaging.state.length])
@@ -51,7 +51,6 @@ export function DepositAccount({ tokenAddress, }: AccountProps) {
             })
 
         } catch (ex) {
-            debugger;
             let message = ex
             if (ex.transactionHash) {
                 message = await getTransactionResult(ex.transactionHash)
@@ -78,7 +77,7 @@ export function DepositAccount({ tokenAddress, }: AccountProps) {
     }
 
     return (
-        <div style={{ display: 'flex' }}>
+        <div style={{ display: 'flex', marginTop: '0.5rem' }}>
             <Balance tokenName={tokenName} balance={tokenBalance}></Balance>
             <span style={{ flexGrow: 2, flexBasis: '1rem', display: 'flex' }}>
                 {tokenBalance?.allowance.gt('0') ?

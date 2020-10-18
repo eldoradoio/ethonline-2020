@@ -53,9 +53,9 @@ export async function getTokenBalance(tokenAddress: string): Promise<TokenBalanc
 }
 
 export async function getTokenSavingsBalance(tokenAddress: string): Promise<TokenBalance> {
-    //const savingsProvider = await accounts.getProviderByToken(tokenAddress)
+    console.log('getting balance from', tokenAddress)
     const balance = await accounts.getBalance(tokenAddress)
-
+    console.log('got balance from', tokenAddress, balance)
     return {
         balance: await balance,
         decimals: 18,
@@ -117,18 +117,26 @@ export async function getProvidersAddressList() {
     return providerAddresses
 }
 
+export type TokenData = { name: string, address: string }
 export type ProviderData = {
     id: string
     //version: string
     name: string
-    depositable: string[]
+    depositable: TokenData[]
 }
 
 export async function getProviderData(providerAddress: string): Promise<ProviderData> {
     const savingProvider = IElDoradoSavingsProviderFactory.connect(providerAddress, provider);
     const name = await savingProvider.getProviderName()
     const id = await savingProvider.getProviderId()
-    const depositable = await savingProvider.getListOfDepositableTokens()
+    const depositableAddresses = await savingProvider.getListOfDepositableTokens()
+    const depositableNames = await Promise.all(depositableAddresses.map(getTokenName))
+    const depositable = depositableAddresses
+        .map((address, i) => ({
+            name: depositableNames[i],
+            address: address
+        }))
+
     //const balance = await accounts.getBalance()
 
     return {

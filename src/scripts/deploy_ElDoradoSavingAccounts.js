@@ -4,11 +4,10 @@ const { BigNumber } = require('@ethersproject/bignumber')
 async function main() {
     const tokens = [
         '0xb5e5d0f8c0cba267cd3d7035d6adc8eba7df7cdd', //'DAI-MSTABLE'
-        //'0x8a9447df1fb47209d36204e6d56767a33bf20f9f', // 'USDC-MSTABLE'
+        '0x8a9447df1fb47209d36204e6d56767a33bf20f9f', // 'USDC-MSTABLE'
+        '0xb404c51bbc10dcbe948077f18a4b8e553d160084' //USDT MSTABLE
     ]
     const MAssetAddress = "0x4E1000616990D83e56f4b5fC6CC8602DcfD20459" //MAsset
-
-
 
     const gasPrice = 100 * 1000000000
 
@@ -25,11 +24,11 @@ async function main() {
     const erc20 = erc20Factory.attach(tokens[0])
 
 
-    //const savingAccounts = await ElDoradoSavingAccounts.attach('0xb5885cF506A0dC37d07218BF2d648F7eB916dB23')
-    console.log('deploying')
-    const savingAccounts = await ElDoradoSavingAccounts.deploy({ gasPrice: gasPrice })
-    await savingAccounts.deployed()
-    console.log('savingAccounts', savingAccounts.address)
+    const savingAccounts = await ElDoradoSavingAccounts.attach('0x6Fb4026895de9eB79044ecaCCEf99168B49cF13C')
+    // console.log('deploying')
+    // const savingAccounts = await ElDoradoSavingAccounts.deploy({ gasPrice: gasPrice })
+    // await savingAccounts.deployed()
+    // console.log('savingAccounts', savingAccounts.address)
 
 
     const mstableProvider = await MStableProvider.attach('0x32cd2dF6ed5C3DEFA3FC994Bf8E858F6Bb9fadEB')
@@ -45,6 +44,8 @@ async function main() {
         const provider = await savingAccounts.addProvider(mstableProvider.address, tokens[i], { gasPrice: gasPrice, gasLimit: 200000 })
         await provider.wait()
     }
+
+    return;
 
     const printBalances = async () => {
         const tasks = [

@@ -17,19 +17,17 @@ export function DepositTap({ providers }: DepositTapProps) {
 
     const depositable = providers.map(x => {
         const accountItems = x.depositable?.map(x => {
-            return (<DepositAccount key={x} tokenAddress={x} ></DepositAccount>)
+            return (<DepositAccount key={x.address} token={x} ></DepositAccount>)
         })
 
         return (
             <div className="provider">
-                <div style={{ width: '80%', maxWidth: '50rem' }}>
-                    {accountItems}
-                </div>
+                {accountItems}
             </div>
         )
     })
 
-  
+
 
     return (
         <section>

@@ -16,21 +16,39 @@ export function WithdrawTab({ providers }: WithdrawTabProps) {
 
 
     const depositable = providers.map(x => {
-        const accountItems = x.depositable?.map(x => {
-            return (<WithdrawTokens key={x} tokenAddress={x} ></WithdrawTokens>)
-        })
 
-        return (
-            <div className="provider">
-                <strong>{x.name}</strong>
-                <div style={{ width: '80%', maxWidth: '50rem' }}>
-                    {accountItems}
+        // each provider might have it's own logic to withdraw
+        if (x.name === "mStable") {
+            //in mstable case, all the tokens are group together, so we cant show them individually
+            return (
+                <div className="provider">
+                    <div>
+                        <WithdrawTokens key={'mstablewithdraw'} provider={x}  />
+                    </div>
                 </div>
-            </div>
-        )
+            )
+        } else {
+            const accountItems = x.depositable?.map(tokenAddress => {
+                return (
+                <WithdrawTokens
+                    provider={x}
+                    key={`othercoins-${tokenAddress}`}
+                    tokenAddress={tokenAddress} />)
+            })
+            return (
+                <div className="provider">
+                    <strong>Other tokens:</strong>
+                    <div>
+                        {accountItems}
+                    </div>
+                </div>
+            )
+        }
+
+
     })
 
-  
+
 
     return (
         <section>

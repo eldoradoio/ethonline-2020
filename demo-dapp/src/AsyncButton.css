@@ -26,6 +26,7 @@ button{
   position: relative;
   width: 80px;
   height: 15px;
+  cursor: not-allowed;
 }
 .lds-facebook div {
   display: inline-block;

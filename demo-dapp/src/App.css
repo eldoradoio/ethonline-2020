@@ -21,6 +21,15 @@ input {
   color: #282c34;
 }
 
+select{
+  padding: 0.6rem;
+  border: 0.5rem solid #282c34; 
+  border-radius: 0.3rem;
+  font-size: 1.2rem;
+  background: #282c34;
+  color: #cdd3dd;
+}
+
 menu {
   margin: 0;
   padding: 1rem 0 0 1rem;
@@ -29,3 +38,4 @@ menu {
   top: 0;
   left: 0;
 }
+

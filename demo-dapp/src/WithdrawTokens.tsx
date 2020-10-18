@@ -1,12 +1,13 @@
 import React, { Props, useContext, useEffect, useState } from 'react'
 import { BigNumber } from 'ethers';
-import { approve, deposit, getTokenBalance, getTokenName, getTokenSavingsBalance, getTransactionResult, TokenBalance, withdraw } from './accounts';
+import { approve, deposit, getTokenBalance, getTokenName, getTokenSavingsBalance, getTransactionResult, ProviderData, TokenBalance, TokenData, withdraw } from './accounts';
 import { AsyncButton } from './AsyncButton';
 import { ActionTypes, MessagingContext } from './Messages';
 import { Balance } from './Balance';
 
 type AccountProps = {
-    tokenAddress: string
+    tokenAddress?: TokenData
+    provider: ProviderData
 }
 
 const FORMATTED_DECIMALS = 2
@@ -21,10 +22,9 @@ const toBigNumber = (value: any, to: number) => {
 
 }
 
-export function WithdrawTokens({ tokenAddress, }: AccountProps) {
+export function WithdrawTokens({ tokenAddress: token, provider }: AccountProps) {
     const [tokenName, setTokenName] = useState<string>('---')
-
-    const [depositAmount, setDepositAmount] = useState<BigNumber>();
+    const [selectedToken, setSelectedToken] = useState<string | undefined>(token?.address)
     const [withdrawAmount, setWithdrawAmount] = useState<BigNumber>();
 
     const [tokenBalance, setTokenBalance] = useState<TokenBalance>()
@@ -34,10 +34,15 @@ export function WithdrawTokens({ tokenAddress, }: AccountProps) {
     const messaging = useContext(MessagingContext)
 
     useEffect(() => {
-        getTokenName(tokenAddress).then(setTokenName)
-        getTokenBalance(tokenAddress).then(setTokenBalance)
-        //getTokenSavingsBalance(tokenAddress).then(setTokenSavingsBalance)
-    }, [tokenAddress, messaging.state.length])
+        if (selectedToken) {
+            getTokenBalance(selectedToken).then(setTokenBalance)
+            getTokenSavingsBalance(selectedToken).then(setTokenSavingsBalance)
+        } else {
+            setTokenName('---')
+            setTokenBalance(undefined)
+            setTokenSavingsBalance(undefined)
+        }
+    }, [token, selectedToken, messaging.state.length])
 
     const tryCall = async (action: Function, sucessMessage: string) => {
         try {
@@ -52,7 +57,6 @@ export function WithdrawTokens({ tokenAddress, }: AccountProps) {
             })
 
         } catch (ex) {
-            debugger;
             let message = ex
             if (ex.transactionHash) {
                 message = await getTransactionResult(ex.transactionHash)
@@ -80,9 +84,23 @@ export function WithdrawTokens({ tokenAddress, }: AccountProps) {
 
     return (
         <div style={{ display: 'flex', marginTop: '0.5rem' }}>
-            <Balance tokenName={tokenName} balance={tokenSavingsBalance}></Balance>
-            <span style={{ flexGrow: 2, flexBasis: '1rem', display: 'flex' }}>
+            <Balance tokenName={undefined} balance={tokenSavingsBalance}></Balance>
+            <span style={{ flexGrow: 4, flexBasis: '1rem', display: 'flex' }}>
                 <React.Fragment>
+                    <span style={{ flexShrink: 1, display: "flex" }}>
+                        <select
+                            defaultValue='-'
+                            onChange={(e) => setSelectedToken(e.target.value)} >
+                            <option value="-" selected disabled>
+                               Select Token
+                            </option>
+                            {provider.depositable.map(x => (
+                                <option value={x.address}>
+                                    {x.name}
+                                </option>
+                            ))}
+                        </select>
+                    </span>
                     <span style={{ flexGrow: 1, display: "flex" }}>
                         <input style={{ flexGrow: 1 }} onChange={(x) => {
                             try {
@@ -95,12 +113,12 @@ export function WithdrawTokens({ tokenAddress, }: AccountProps) {
                     </span>
                     <span>
                         <AsyncButton
-                            key={tokenAddress}
-                            disabled={withdrawAmount ? false : true}
-                            onClick={() => withdrawAmount ? tryCall(() => withdraw(tokenAddress, withdrawAmount), "Withdraw completed!") : undefined}
+                            key={token?.address}
+                            disabled={withdrawAmount && selectedToken ? false : true}
+                            onClick={() => (withdrawAmount && selectedToken) ? tryCall(() => withdraw(selectedToken, withdrawAmount), "Withdraw completed!") : undefined}
                         >
                             Withdraw
-                                    </AsyncButton>
+                        </AsyncButton>
                     </span>
                 </React.Fragment>
             </span>
