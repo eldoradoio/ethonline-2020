@@ -23,17 +23,18 @@ export function WithdrawTab({ providers }: WithdrawTabProps) {
             return (
                 <div className="provider">
                     <div>
-                        <WithdrawTokens key={'mstablewithdraw'} provider={x}  />
+                        <strong>USD:</strong>
+                        <WithdrawTokens key={'mstablewithdraw'} provider={x} />
                     </div>
                 </div>
             )
         } else {
             const accountItems = x.depositable?.map(tokenAddress => {
                 return (
-                <WithdrawTokens
-                    provider={x}
-                    key={`othercoins-${tokenAddress}`}
-                    tokenAddress={tokenAddress} />)
+                    <WithdrawTokens
+                        provider={x}
+                        key={`othercoins-${tokenAddress}`}
+                        tokenAddress={tokenAddress} />)
             })
             return (
                 <div className="provider">
