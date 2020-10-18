@@ -35,7 +35,7 @@ export function Account({ tokenAddress, }: AccountProps) {
     useEffect(() => {
         getTokenName(tokenAddress).then(setTokenName)
         getTokenBalance(tokenAddress).then(setTokenBalance)
-        getTokenSavingsBalance(tokenAddress).then(setTokenSavingsBalance)
+        //getTokenSavingsBalance(tokenAddress).then(setTokenSavingsBalance)
     }, [tokenAddress, messaging.state.length])
 
     const tryCall = async (action: Function, sucessMessage: string) => {
@@ -118,7 +118,7 @@ export function Account({ tokenAddress, }: AccountProps) {
 
                 </span>
             </div>
-            <div style={{ display: 'flex', marginTop: '0.5rem' }}>
+            {/* <div style={{ display: 'flex', marginTop: '0.5rem' }}>
                 <Balance tokenName={tokenName} balance={tokenSavingsBalance}></Balance>
                 <span style={{ flexGrow: 2, flexBasis: '1rem', display: 'flex' }}>
                     <React.Fragment>
@@ -143,7 +143,7 @@ export function Account({ tokenAddress, }: AccountProps) {
                         </span>
                     </React.Fragment>
                 </span>
-            </div>
+            </div> */}
         </div>
     )
 }

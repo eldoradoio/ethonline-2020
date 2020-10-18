@@ -1,0 +1,34 @@
+.tab-container{
+    width: 80%;
+}
+.switch-container{
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.switch-button{
+    background: #46337a;
+    border: 0.5rem solid #46337a; 
+    
+    padding: 0.6rem;
+    
+    border-radius: 0.3rem;
+    font-size: 1.2rem;
+    
+    color: white;
+    cursor: pointer;
+    margin: 0.5rem;
+}
+
+.switch-button:hover{
+    border-color: #7040aa;
+    background: #7040aa;
+}
+    
+
+.switch-button.selected{
+    border: 0.5rem solid #663399; 
+    background: rebeccapurple;
+    
+}

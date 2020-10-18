@@ -121,22 +121,25 @@ export type ProviderData = {
     id: string
     //version: string
     name: string
+    depositable: string[]
 }
 
-export async function getProviderSavingsBalance(providerAddress: string): Promise<ProviderData> {
+export async function getProviderData(providerAddress: string): Promise<ProviderData> {
     const savingProvider = IElDoradoSavingsProviderFactory.connect(providerAddress, provider);
     const name = await savingProvider.getProviderName()
     const id = await savingProvider.getProviderId()
+    const depositable = await savingProvider.getListOfDepositableTokens()
     //const balance = await accounts.getBalance()
 
     return {
         id: id,
-        name: name
+        name: name,
+        depositable: depositable
     }
 }
 
 export async function getAllProviders() {
     const addresses = await getProvidersAddressList();
-    const providers = await Promise.all(addresses.map(getProviderSavingsBalance))
+    const providers = await Promise.all(addresses.map(getProviderData))
     return providers
 }
