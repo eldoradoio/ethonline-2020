@@ -25,22 +25,20 @@ export function DepositAccount({ token, }: AccountProps) {
     const tokenName = token.name
 
     const [depositAmount, setDepositAmount] = useState<BigNumber>();
-    const [withdrawAmount, setWithdrawAmount] = useState<BigNumber>();
 
     const [tokenBalance, setTokenBalance] = useState<TokenBalance>()
-    const [tokenSavingsBalance, setTokenSavingsBalance] = useState<TokenBalance>()
 
 
     const messaging = useContext(MessagingContext)
 
     useEffect(() => {
         getTokenBalance(tokenAddress).then(setTokenBalance)
-        //getTokenSavingsBalance(tokenAddress).then(setTokenSavingsBalance)
     }, [tokenAddress, messaging.state.length])
 
     const tryCall = async (action: Function, sucessMessage: string) => {
         try {
             await action()
+            setDepositAmount(undefined)
             messaging.dispatcher({
                 message: {
                     body: sucessMessage || "Action completed!",

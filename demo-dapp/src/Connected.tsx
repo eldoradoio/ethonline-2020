@@ -10,7 +10,7 @@ type ConnectedProps = {
 
 export function Connected({ address }: ConnectedProps) {
     const [providers, setProviders] = useState<ProviderData[]>([])
-    const [copied, setCopied ] = useState<boolean>(false)
+    const [copied, setCopied] = useState<boolean>(false)
 
     useEffect(() => {
         console.log('effect')
@@ -47,7 +47,7 @@ export function Connected({ address }: ConnectedProps) {
     return (<React.Fragment>
         <div>
             Connected with: {formatAddress(address)} <span>
-                <button style={{width: '5.2rem', fontSize: '1rem'}} onClick={copyToClipboard}>{copied ? '[✓]' : '[Copy]'}</button>
+                <button style={{ width: '4.2rem', border: 'none', fontSize: '0.8rem', color: '#d7d7d7', background:'#50486a' }} onClick={copyToClipboard}>{copied ? '[✓]' : '[Copy]'}</button>
             </span>
         </div>
         <TabSwitch labels={["Deposit", "Withdraw"]}>

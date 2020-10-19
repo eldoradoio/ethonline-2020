@@ -47,6 +47,7 @@ export function WithdrawTokens({ tokenAddress: token, provider }: AccountProps) 
     const tryCall = async (action: Function, sucessMessage: string) => {
         try {
             await action()
+            setWithdrawAmount(undefined)
             messaging.dispatcher({
                 message: {
                     body: sucessMessage || "Action completed!",
