@@ -38,11 +38,7 @@ export function WithdrawTab({ providers }: WithdrawTabProps) {
                 </div>
             )
         }
-
-
     })
-
-
 
     return (
         <section>

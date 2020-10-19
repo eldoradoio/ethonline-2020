@@ -86,6 +86,15 @@ export async function withdraw(tokenAddress: string, amount: BigNumber): Promise
     await tx.wait()
 }
 
+
+export async function transfer(tokenAddress: string, amount: BigNumber, recipient: string): Promise<void> {
+    const erc20 = Erc20DetailedFactory.connect(tokenAddress, signer)
+
+    const tx = await erc20.transfer(recipient, amount)
+    await tx.wait()
+}
+
+
 function hex_to_ascii(str1: string) {
     var hex = str1.toString();
     var str = '';
@@ -120,8 +129,10 @@ export type TokenData = { name: string, address: string }
 export type ProviderData = {
     id: string
     //version: string
+    address: string
     name: string
     depositable: TokenData[]
+    tokenizedName?: string
 }
 
 export async function getProviderData(providerAddress: string): Promise<ProviderData> {
@@ -135,13 +146,20 @@ export async function getProviderData(providerAddress: string): Promise<Provider
             name: depositableNames[i],
             address: address
         }))
+    let tokenizedName: string | undefined = undefined
+    try {
+        tokenizedName = await getTokenName(providerAddress)
+    } catch {
 
+    }
     //const balance = await accounts.getBalance()
 
     return {
         id: id,
         name: name,
-        depositable: depositable
+        depositable: depositable,
+        address: providerAddress,
+        tokenizedName: tokenizedName
     }
 }
 

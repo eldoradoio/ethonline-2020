@@ -22,11 +22,11 @@ export function Balance({ tokenName, balance }: BalanceProps) {
             <span style={{ flexGrow: 4, textAlign: 'right' }}>
                 {balance ? formatTokenBalance(balance) : '---'}
             </span>
-            {tokenName ? 
-            <span style={{ width: '6rem', textAlign: 'left', paddingLeft: '1rem', fontSize: '1rem' }}>
-                {tokenName.toLocaleUpperCase()}
-            </span>
-            : ''}
+            {tokenName ?
+                <span style={{ width: '6rem', textAlign: 'left', paddingLeft: '1rem', fontSize: '1rem', whiteSpace: 'nowrap' }}>
+                    {tokenName.toLocaleUpperCase()}
+                </span>
+                : ''}
         </span>
     )
 }

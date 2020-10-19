@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { getAllProviders, ProviderData } from "./accounts";
 import { DepositTap } from "./DepositTab";
+import { SendTab } from "./SendTab";
 import { TabSwitch } from "./TabSwitch";
 import { WithdrawTab } from "./WithdrawTab";
 
@@ -50,9 +51,10 @@ export function Connected({ address }: ConnectedProps) {
                 <button style={{ width: '4.2rem', border: 'none', fontSize: '0.8rem', color: '#d7d7d7', background:'#50486a' }} onClick={copyToClipboard}>{copied ? '[✓]' : '[Copy]'}</button>
             </span>
         </div>
-        <TabSwitch labels={["Deposit", "Withdraw"]}>
+        <TabSwitch labels={["Deposit", "Withdraw", "Send"]}>
             <DepositTap providers={providers}></DepositTap>
             <WithdrawTab providers={providers}></WithdrawTab>
+            <SendTab providers={providers}></SendTab>
         </TabSwitch>
 
     </React.Fragment>)
