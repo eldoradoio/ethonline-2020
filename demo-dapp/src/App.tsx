@@ -1,10 +1,9 @@
-import React, { useContext, useEffect, useReducer, useState } from 'react';
+import React, { useEffect, useReducer, useState } from 'react';
 import logo from './logo.webp';
 import './App.css';
 import { getConnectedAddress } from './accounts';
 import { Connected } from './Connected';
-import { ActionTypes, Messages, messaging, CurrentMessagingState, MessasingActionTypes, MessagingContext } from './Messages';
-import { AsyncButton } from './AsyncButton';
+import { Messages, messaging, CurrentMessagingState, MessagingContext } from './Messages';
 
 function App() {
 

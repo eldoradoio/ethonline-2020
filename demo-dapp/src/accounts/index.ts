@@ -19,6 +19,9 @@ const signer = provider.getSigner()
 
 const accounts = ElDoradoSavingAccountsFactory.connect('0xD86637c69e1a207869062E954504cED0F17D6bFF', signer)
 
+console.log('***********************************************************************************')
+console.log('* USING EL DORADO SAVINGS ACCOUNT AT: ', accounts.address)
+console.log('***********************************************************************************')
 
 export async function getConnectedAddress(): Promise<string> {
     const address = await signer.getAddress()
