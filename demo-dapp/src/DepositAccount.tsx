@@ -110,7 +110,7 @@ export function DepositAccount({ token, }: AccountProps) {
                         disabled={false}
                         onClick={() => tryCall(() => approve(tokenAddress), "Use of tokens approved")}
                     >
-                        Approve use of tokens
+                        Approve usage
                     </AsyncButton>)
                 }
 
