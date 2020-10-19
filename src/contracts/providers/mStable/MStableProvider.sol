@@ -6,14 +6,17 @@ import "@mstable/protocol/contracts/interfaces/IMStableHelper.sol";
 import "@mstable/protocol/contracts/interfaces/ISavingsContract.sol";
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20Detailed.sol";
 import "@openzeppelin/contracts/utils/EnumerableSet.sol";
 
 import "../../IElDoradoSavingsProvider.sol";
 
 //NOTE APY = ((amount now * 1e18 / amount then) - 1e18) * (secondsInYear / depositLengthInSeconds)
-
-contract MStableProvider is IElDoradoSavingsProvider {
+//ERC20Detailed
+contract MStableProvider is IElDoradoSavingsProvider, ERC20, ERC20Detailed {
 	using EnumerableSet for EnumerableSet.AddressSet;
+	using SafeMath for uint256;
 
 	IMasset private masset;
 	ISavingsContract private savings;
@@ -21,23 +24,27 @@ contract MStableProvider is IElDoradoSavingsProvider {
 	IMStableHelper private helper;
 
 	EnumerableSet.AddressSet private _tokens;
-	// User > balance
+	// User > deposited amounts
 	mapping(address => uint256) private depositedBalances;
-	// User > credits
-	mapping(address => uint256) private creditBalances;
 
+	// User > credits | balance
+	mapping(address => uint256) private _balances;
+
+	//erc20
+	mapping(address => mapping(address => uint256)) private _allowances;
+
+	//Total deposited, not credits created
 	uint256 private totalDeposited;
 
 	constructor(
 		address _masset,
 		ISavingsContract _savings,
 		IMStableHelper _helper
-	) public {
+	) public ERC20Detailed("El Dorado USD Saving Tokens", "DORADOS", 18) {
 		masset = IMasset(_masset);
 		savings = _savings;
 		mUSD = IERC20(_masset);
 		helper = _helper;
-		totalDeposited = 0;
 	}
 
 	function approveToken(address _tokenAddress) external returns (bool) {
@@ -73,9 +80,11 @@ contract MStableProvider is IElDoradoSavingsProvider {
 
 		uint256 massetsMinted = masset.mintTo(_tokenAddress, _amount, address(this));
 
-		// deposit masset. We save the credits per account
-		creditBalances[account] += savings.depositSavings(massetsMinted);
 		depositedBalances[account] += massetsMinted;
+
+		// deposit masset. We save the credits per account and mint that credit
+		_mint(account, savings.depositSavings(massetsMinted));//depositSavings returns credits
+
 		totalDeposited += massetsMinted;
 
 		return massetsMinted;
@@ -104,7 +113,7 @@ contract MStableProvider is IElDoradoSavingsProvider {
 		require(_amount > 0, "Must withdraw something");
 		// Get user credits
 		uint256 creditUnits = helper.getSaveRedeemInput(savings, _amount);
-		require(creditUnits <= creditBalances[account], "Cannot withdraw more than total in account");
+		require(creditUnits <= balanceOf(account), "Cannot withdraw more than total in account");
 
 		// Credits to mAssset
 		uint256 massetReturned = savings.redeem(creditUnits);
@@ -118,7 +127,7 @@ contract MStableProvider is IElDoradoSavingsProvider {
 		uint256 redeemed = masset.redeemTo(address(_tokenAddress), bassetQuantityArg, account);
 
 		// Recalcualte creditBalances
-		creditBalances[account] -= creditUnits;
+		_burn(account, creditUnits);
 		depositedBalances[account] -= massetReturned;
 		totalDeposited -= massetReturned;
 
@@ -161,7 +170,12 @@ contract MStableProvider is IElDoradoSavingsProvider {
 	function _getBalance(address account) private view returns (uint256) {
 		// Notes from mStable person:
 		// The amount of mUSD this user owns at any point in time can then be calculated as creditsIssued * exchangeRate / 1e18;
-		return (creditBalances[account] * savings.exchangeRate()) / 1e18;
+		//this converts credits to tokens
+        return (_balances[account] * savings.exchangeRate()) / 1e18;
+	}
+
+	function _fromTokenToCredits(uint256 tokens) private view returns (uint256) {
+		return   (tokens * 1e18) / savings.exchangeRate();
 	}
 
 	function _getDeposited(address account) private view returns (uint256) {
@@ -185,8 +199,9 @@ contract MStableProvider is IElDoradoSavingsProvider {
 		return result;
 	}
 
-	// function creditBalances(address) external view returns (uint256);
-
+	/*
+	 * EL DORADO PROVIDER
+	 */
 	function getProviderId() external view returns (bytes32) {
 		return keccak256("MSTABLE");
 	}
@@ -197,5 +212,116 @@ contract MStableProvider is IElDoradoSavingsProvider {
 
 	function getProviderName() external view returns (string memory) {
 		return "mStable";
+	}
+
+	/*
+	 * ERC20
+	 */
+
+	/**
+	 * @dev See {IERC20-totalSupply}.
+	 */
+	function totalSupply() public view returns (uint256) {
+		return (totalDeposited * savings.exchangeRate()) / 1e18;
+	}
+
+	/**
+	 * @dev See {IERC20-balanceOf}.
+	 */
+	function balanceOf(address account) public view returns (uint256) {
+		return _getBalance(account);
+	}
+
+	/**
+	 * @dev See {IERC20-transfer}.
+	 *
+	 * Requirements:
+	 *
+	 * - `recipient` cannot be the zero address.
+	 * - the caller must have a balance of at least `amount`.
+	 */
+	function transfer(address recipient, uint256 amount) public returns (bool) {
+		_transfer(_msgSender(), recipient, _fromTokenToCredits(amount));
+		return true;
+	}
+
+	/**
+	 * @dev See {IERC20-allowance}.
+	 */
+	function allowance(address owner, address spender) public view returns (uint256) {
+		return _allowances[owner][spender];
+	}
+
+	/**
+	 * @dev See {IERC20-approve}.
+	 *
+	 * Requirements:
+	 *
+	 * - `spender` cannot be the zero address.
+	 */
+	function approve(address spender, uint256 amount) public returns (bool) {
+		_approve(_msgSender(), spender, _fromTokenToCredits(amount));
+		return true;
+	}
+
+	/**
+	 * @dev See {IERC20-transferFrom}.
+	 *
+	 * Emits an {Approval} event indicating the updated allowance. This is not
+	 * required by the EIP. See the note at the beginning of {ERC20};
+	 *
+	 * Requirements:
+	 * - `sender` and `recipient` cannot be the zero address.
+	 * - `sender` must have a balance of at least `amount`.
+	 * - the caller must have allowance for `sender`'s tokens of at least
+	 * `amount`.
+	 */
+	function transferFrom(
+		address sender,
+		address recipient,
+		uint256 amount
+	) public returns (bool) {
+		amount = _fromTokenToCredits(amount);
+		_transfer(sender, recipient, amount);
+		_approve(sender, _msgSender(), _allowances[sender][_msgSender()].sub(amount, "ERC20: transfer amount exceeds allowance"));
+		return true;
+	}
+
+	/**
+	 * @dev Atomically increases the allowance granted to `spender` by the caller.
+	 *
+	 * This is an alternative to {approve} that can be used as a mitigation for
+	 * problems described in {IERC20-approve}.
+	 *
+	 * Emits an {Approval} event indicating the updated allowance.
+	 *
+	 * Requirements:
+	 *
+	 * - `spender` cannot be the zero address.
+	 */
+	function increaseAllowance(address spender, uint256 addedValue) public returns (bool) {
+		addedValue = _fromTokenToCredits(addedValue);
+		_approve(_msgSender(), spender, _allowances[_msgSender()][spender].add(addedValue));
+		return true;
+	}
+
+	/**
+	 * @dev Atomically decreases the allowance granted to `spender` by the caller.
+	 *
+	 * This is an alternative to {approve} that can be used as a mitigation for
+	 * problems described in {IERC20-approve}.
+	 *
+	 * Emits an {Approval} event indicating the updated allowance.
+	 *
+	 * Requirements:
+	 *
+	 * - `spender` cannot be the zero address.
+	 * - `spender` must have allowance for the caller of at least
+	 * `subtractedValue`.
+	 */
+	function decreaseAllowance(address spender, uint256 subtractedValue) public returns (bool) {
+		subtractedValue = _fromTokenToCredits(subtractedValue);
+		_approve(_msgSender(), spender, _allowances[_msgSender()][spender].sub(subtractedValue, "ERC20: decreased allowance below zero"));
+		return true;
 	}
 }

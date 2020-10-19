@@ -54,7 +54,7 @@ async function main() {
   /*
   * CONTRACT SETUP
   */
-  console.log('Deploying...')
+  // console.log('Deploying...')
   const mstableProvider = await MStableProvider.deploy(
     MAssetAddress, //MAsset, 
     "0x300e56938454A4d8005B2e84eefFca002B3a24Bc", //ISavingsContract
@@ -64,7 +64,7 @@ async function main() {
     }
   );
 
-  //const mstableProvider = MStableProvider.attach("0x83E286Ce4C577C421a19fb078FDC9EA29415Ef68")
+  //const mstableProvider = MStableProvider.attach("0xB497A83CdE52E817f2a502C11F4bDa750A0bBE18")
 
   const mstableProviderAddress = mstableProvider.address;
 
