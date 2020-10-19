@@ -41,6 +41,29 @@ describe("ElDoradoSavingAccounts", function () {
 
   });
 
+  it("Should not duplicate providers", async function () {
+    const savingAccounts = await getNewInstanceOf("ElDoradoSavingAccounts")
+
+    const mockProvider_1 = await getNewInstanceOf("MockProvider")
+    const mockProvider_2 = await getNewInstanceOf("MockProvider")
+
+    const erc20_1 = await getNewInstanceOf("ERC20Mintable")
+    const erc20_2 = await getNewInstanceOf("ERC20Mintable")
+
+
+    expect(await savingAccounts.providersCount()).to.equal(0);
+
+    await savingAccounts.addProvider(mockProvider_1.address, erc20_1.address);
+    await savingAccounts.addProvider(mockProvider_2.address, erc20_2.address);
+    await savingAccounts.addProvider(mockProvider_2.address, erc20_2.address);
+    await savingAccounts.addProvider(mockProvider_1.address, erc20_1.address);
+    await savingAccounts.addProvider(mockProvider_2.address, erc20_2.address);
+
+    expect(await savingAccounts.providersCount()).to.equal(2);
+
+  })
+
+
   it("Should allow anyone to deposit tokens on a specific provider", async function () {
     const signers = await ethers.getSigners()
     const userAddress = await signers[0].getAddress()
