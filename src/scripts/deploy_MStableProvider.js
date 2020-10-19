@@ -54,7 +54,7 @@ async function main() {
   /*
   * CONTRACT SETUP
   */
-  // console.log('Deploying...')
+  console.log('Deploying...')
   const mstableProvider = await MStableProvider.deploy(
     MAssetAddress, //MAsset, 
     "0x300e56938454A4d8005B2e84eefFca002B3a24Bc", //ISavingsContract
@@ -64,7 +64,7 @@ async function main() {
     }
   );
 
-  //const mstableProvider = MStableProvider.attach("0xB497A83CdE52E817f2a502C11F4bDa750A0bBE18")
+  //const mstableProvider = MStableProvider.attach("0x25E8A56Bf279cEa4A0f63b51B13A65B3e11A61ba")
 
   const mstableProviderAddress = mstableProvider.address;
 
@@ -73,6 +73,7 @@ async function main() {
   (await mstableProvider.approveToken(erc20Address, { gasPrice: gasPrice })).wait();
 
   console.log("MStableProvider deployed to:", mstableProviderAddress);
+  const doradosERC20 = erc20Factory.attach(mstableProviderAddress)
 
   //console.log('suggestMintAsset', (await mstableProvider.suggestMintAsset()));
 
@@ -83,16 +84,18 @@ async function main() {
       mstableProvider.getBalance(signerAddress, erc20Address),
       mstableProvider.getEarnings(signerAddress, erc20Address),
       erc20.balanceOf(signerAddress),
+      doradosERC20.balanceOf(signerAddress),
       mAsset.balanceOf(mstableProviderAddress),
       mstableProvider.exchangeRate(),
       mstableProvider.getTotalDeposited()
     ]
-    const [savings, earntOf, erc20Balance, mAssets, exchangeRate, getTotalDeposited] = await Promise.all(tasks)
+    const [savings, earntOf, erc20Balance, dorados, mAssets, exchangeRate, getTotalDeposited] = await Promise.all(tasks)
 
     //console.clear();
     console.log('* Savings balance', savings.toString());
     console.log('* Earnt balance', earntOf.toString());
     console.log('* User ERC20 balance', erc20Balance.toString())
+    console.log('* User Dorados balance', dorados.toString())
     console.log('* Provider mStable balance', mAssets.toString())
     console.log('* Exchange rate', exchangeRate.toString())
     console.log('* Total Deposited', getTotalDeposited.toString())
@@ -108,7 +111,7 @@ async function main() {
   * AMOUNT TO PLAY WITH
   */
   const ercBalance = await erc20.balanceOf(signerAddress)
-  const amount = ercBalance
+  const amount = BigNumber.from('1000000')/// USDC has 6 digits
   console.log('Amount', amount.toString())
 
   if (amount > 0) {
