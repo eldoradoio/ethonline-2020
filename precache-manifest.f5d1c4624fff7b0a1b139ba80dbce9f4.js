@@ -1,23 +1,23 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "2ac77bb54fa31f8da801cc21e71e8e4b",
+    "revision": "0b23e9984dbf6c7ad011383ca0dca7f8",
     "url": "/ethonline-2020/index.html"
   },
   {
-    "revision": "59931d61184f61a99639",
+    "revision": "4df208635904f33f11eb",
     "url": "/ethonline-2020/static/css/main.310e7e9b.chunk.css"
   },
   {
-    "revision": "f2387aafc96801b6ad90",
-    "url": "/ethonline-2020/static/js/2.f73cded3.chunk.js"
+    "revision": "95c4ee36f80f67e63763",
+    "url": "/ethonline-2020/static/js/2.a8977316.chunk.js"
   },
   {
     "revision": "d576ef9c8d0783fb684cf10d76473333",
-    "url": "/ethonline-2020/static/js/2.f73cded3.chunk.js.LICENSE.txt"
+    "url": "/ethonline-2020/static/js/2.a8977316.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "59931d61184f61a99639",
-    "url": "/ethonline-2020/static/js/main.a69a2e9f.chunk.js"
+    "revision": "4df208635904f33f11eb",
+    "url": "/ethonline-2020/static/js/main.548e6f3d.chunk.js"
   },
   {
     "revision": "39e54782a47c9dd38e1c",

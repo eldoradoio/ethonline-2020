@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/ethonline-2020/precache-manifest.4fd4d3af432dc94d52505316f9b20f31.js"
+  "/ethonline-2020/precache-manifest.f5d1c4624fff7b0a1b139ba80dbce9f4.js"
 );
 
 self.addEventListener('message', (event) => {
