@@ -24,14 +24,14 @@ async function main() {
     const erc20 = erc20Factory.attach(tokens[0])
 
 
-    const savingAccounts = await ElDoradoSavingAccounts.attach('0x6Fb4026895de9eB79044ecaCCEf99168B49cF13C')
-    // console.log('deploying')
-    // const savingAccounts = await ElDoradoSavingAccounts.deploy({ gasPrice: gasPrice })
-    // await savingAccounts.deployed()
-    // console.log('savingAccounts', savingAccounts.address)
+    //const savingAccounts = await ElDoradoSavingAccounts.attach('0x6Fb4026895de9eB79044ecaCCEf99168B49cF13C')
+    console.log('deploying')
+    const savingAccounts = await ElDoradoSavingAccounts.deploy({ gasPrice: gasPrice })
+    await savingAccounts.deployed()
+    console.log('savingAccounts', savingAccounts.address)
 
 
-    const mstableProvider = await MStableProvider.attach('0x32cd2dF6ed5C3DEFA3FC994Bf8E858F6Bb9fadEB')
+    const mstableProvider = await MStableProvider.attach('0xE8A98DA25B3890C34ce80E88a32B70cB5A10dc2A')
     console.log('mstableProvider', mstableProvider.address)
 
 
@@ -41,11 +41,9 @@ async function main() {
  
     for (let i = 0; i < tokens.length; i++) {
         console.log('adding provider-token', tokens[i])
-        const provider = await savingAccounts.addProvider(mstableProvider.address, tokens[i], { gasPrice: gasPrice, gasLimit: 200000 })
+        const provider = await savingAccounts.addProvider(mstableProvider.address, tokens[i], { gasPrice: gasPrice, gasLimit: 250000 })
         await provider.wait()
     }
-
-    return;
 
     const printBalances = async () => {
         const tasks = [

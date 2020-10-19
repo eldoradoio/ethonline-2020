@@ -1,7 +1,5 @@
-import { BigNumber } from "ethers";
 import React, { useEffect, useState } from "react";
-import { DepositAccount } from "./DepositAccount";
-import { getAccounts, getAllProviders, ProviderData } from "./accounts";
+import { getAllProviders, ProviderData } from "./accounts";
 import { DepositTap } from "./DepositTab";
 import { TabSwitch } from "./TabSwitch";
 import { WithdrawTab } from "./WithdrawTab";
@@ -16,7 +14,6 @@ export function Connected({ address }: ConnectedProps) {
     useEffect(() => {
         console.log('effect')
         getAllProviders().then(setProviders)
-        //getAccounts().then(setAccounts)
     }, [address])
 
 

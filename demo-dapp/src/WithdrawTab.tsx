@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { ProviderData } from "./accounts";
 import { WithdrawTokens } from "./WithdrawTokens";
 
@@ -7,13 +7,6 @@ type WithdrawTabProps = {
 }
 
 export function WithdrawTab({ providers }: WithdrawTabProps) {
-    const [accounts, setAccounts] = useState<string[]>()
-
-    useEffect(() => {
-        //getAccounts().then(setAccounts)
-    }, [])
-
-
 
     const depositable = providers.map(x => {
 

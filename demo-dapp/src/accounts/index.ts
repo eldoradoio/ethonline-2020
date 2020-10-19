@@ -17,7 +17,7 @@ const provider = new ethers.providers.Web3Provider(portis.provider)
 const signer = provider.getSigner()
 
 
-const accounts = ElDoradoSavingAccountsFactory.connect('0x6Fb4026895de9eB79044ecaCCEf99168B49cF13C', signer)
+const accounts = ElDoradoSavingAccountsFactory.connect('0xD86637c69e1a207869062E954504cED0F17D6bFF', signer)
 
 
 export async function getConnectedAddress(): Promise<string> {
@@ -29,10 +29,6 @@ export async function getConnectedAddress(): Promise<string> {
 export function getBalance(tokenAddress: string): Promise<BigNumber> {
     //getEarnings
     return accounts.getBalance(tokenAddress)
-}
-
-export async function getAccounts(): Promise<string[]> {
-    return ['0xb5e5d0f8c0cba267cd3d7035d6adc8eba7df7cdd', '0xb404c51bbc10dcbe948077f18a4b8e553d160084'] //these should come from the contract
 }
 
 export async function getTokenName(tokenAddress: string): Promise<string> {
