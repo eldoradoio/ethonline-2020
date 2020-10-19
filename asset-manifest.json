@@ -1,14 +1,14 @@
 {
   "files": {
     "main.css": "/ethonline-2020/static/css/main.310e7e9b.chunk.css",
-    "main.js": "/ethonline-2020/static/js/main.548e6f3d.chunk.js",
-    "main.js.map": "/ethonline-2020/static/js/main.548e6f3d.chunk.js.map",
+    "main.js": "/ethonline-2020/static/js/main.02a5bc42.chunk.js",
+    "main.js.map": "/ethonline-2020/static/js/main.02a5bc42.chunk.js.map",
     "runtime-main.js": "/ethonline-2020/static/js/runtime-main.cef7e369.js",
     "runtime-main.js.map": "/ethonline-2020/static/js/runtime-main.cef7e369.js.map",
     "static/js/2.a8977316.chunk.js": "/ethonline-2020/static/js/2.a8977316.chunk.js",
     "static/js/2.a8977316.chunk.js.map": "/ethonline-2020/static/js/2.a8977316.chunk.js.map",
     "index.html": "/ethonline-2020/index.html",
-    "precache-manifest.f5d1c4624fff7b0a1b139ba80dbce9f4.js": "/ethonline-2020/precache-manifest.f5d1c4624fff7b0a1b139ba80dbce9f4.js",
+    "precache-manifest.b47cc4f3fca34417ae55432c4b724d70.js": "/ethonline-2020/precache-manifest.b47cc4f3fca34417ae55432c4b724d70.js",
     "service-worker.js": "/ethonline-2020/service-worker.js",
     "static/css/main.310e7e9b.chunk.css.map": "/ethonline-2020/static/css/main.310e7e9b.chunk.css.map",
     "static/js/2.a8977316.chunk.js.LICENSE.txt": "/ethonline-2020/static/js/2.a8977316.chunk.js.LICENSE.txt",
@@ -18,6 +18,6 @@
     "static/js/runtime-main.cef7e369.js",
     "static/js/2.a8977316.chunk.js",
     "static/css/main.310e7e9b.chunk.css",
-    "static/js/main.548e6f3d.chunk.js"
+    "static/js/main.02a5bc42.chunk.js"
   ]
 }
