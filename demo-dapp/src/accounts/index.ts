@@ -9,11 +9,13 @@ import { ElDoradoSavingAccountsFactory } from '../assets/types/ElDoradoSavingAcc
 import { IElDoradoSavingsProviderFactory } from '../assets/types/IElDoradoSavingsProviderFactory';
 
 import { Erc20DetailedFactory } from '../assets/types/Erc20DetailedFactory'
+import { Erc20Factory, MStableProviderFactory } from '../assets/types';
 
 const network = 'ropsten'
 
 const portis = new Portis('89eb3ac5-6738-42b7-98c0-3e3ca4a39853', network);
 const provider = new ethers.providers.Web3Provider(portis.provider)
+const readonlyProvider = new ethers.providers.InfuraProvider('ropsten', 'b7f5cd5ebd97457fb6deac2856569177')
 const signer = provider.getSigner()
 
 
@@ -162,7 +164,7 @@ export async function getProviderData(providerAddress: string): Promise<Provider
         address: providerAddress,
         tokenizedName: tokenizedName,
         //If it's a tokenized provider, then we put it here
-        providerTokenAPY: tokenizedName ? await getAPYForProvider(providerAddress, providerAddress, name) : undefined
+        providerTokenAPY: tokenizedName ? await getTokenApy(providerAddress, name) : undefined
     }
 }
 
@@ -177,19 +179,67 @@ export type TokenAPYData = {
     apy: BigNumber
 }
 
-export async function getAPYForProvider(providerAddress: string, tokenAddress: string, providerName?: string): Promise<TokenAPYData | undefined> {
-    let name = providerName
-    if (!name) {
-        const savingProvider = IElDoradoSavingsProviderFactory.connect(providerAddress, provider);
-        name = await savingProvider.getProviderName()
-    }
+export async function getTokenApy(tokenAddress: string, providerName?: string): Promise<TokenAPYData | undefined> {
+    //TODO: This applies only to mStable, we should implemented per provider
+    var token = Erc20Factory.connect(tokenAddress, readonlyProvider)
+    var mstable = MStableProviderFactory.connect(tokenAddress, readonlyProvider)
+    //from mint
+    const filter = token.filters.Transfer('0x0000000000000000000000000000000000000000', null, null)
+    const toBlockNumber = await readonlyProvider.getBlockNumber();
+    const events = await token.queryFilter(filter, 0, toBlockNumber)
 
-    if (name.toLocaleLowerCase() === 'mstable') {
-        return {
-            tokenAddress: tokenAddress,
-            apy: BigNumber.from('12')
+    const tryGetRage = async (block: number)=>{
+        try{
+            return await mstable.exchangeRate({
+                blockTag: block //8916576//x.blockNumber 
+            })
+        }
+        catch{
+            console.log('failed')
+            return BigNumber.from('1')
         }
     }
 
+    const blocks =
+        await Promise.all(
+            events
+                .reduce((p, c, i) => {
+                    if (p.findIndex(x => x.blockNumber == c.blockNumber) < 0)
+                        p.push(c)
+                    return p
+                }, events.filter(() => false))
+                .map(async x => (
+                    {
+                        block: await x.getBlock(),
+                        rate: await tryGetRage(x.blockNumber)
+                    }
+                ))
+        )
+
+
+
+    //NOTE MSTABLE APY = ((amount now * 1e18 / amount then) - 1e18) * (secondsInYear / depositLengthInSeconds)
+    //from docs: apy = ((1 + percentageRateChange)^(compoundIntervalCountPerYear)) - 1
+    const points = blocks.map(x => {
+        return {
+            value: x.rate,
+            timestamp: x.block.timestamp,
+            apy: BigNumber.from('0')
+        }
+    })
+
+    const e18 = BigNumber.from('1' + ''.padEnd(18, '0'))
+    const secondsInYear = BigNumber.from('31556926')
+    for (let i = 1; i < points.length; i++) {
+        const left = points[i].value.mul(e18).div(points[i - 1].value).sub(e18)
+        const right = secondsInYear.div(points[i - 1].timestamp - points[i].timestamp)
+        points[i].apy = left.mul(right)
+    }
+    console.log(points)
+
+    return {
+        tokenAddress: tokenAddress,
+        apy: points[points.length - 1].apy
+    }
     return undefined
 }

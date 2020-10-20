@@ -19,6 +19,7 @@ function delay(seconds) {
 
 async function main() {
   // TODO: make this test with multiple users/accounts
+  // TODO: Migrate tokens from prev address to new deployment
 
   const fromExp = (bn, from, to) => {
     if (from > to)

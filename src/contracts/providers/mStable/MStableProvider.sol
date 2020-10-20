@@ -40,6 +40,15 @@ contract MStableProvider is IElDoradoSavingsProvider, Context, IERC20, ERC20Deta
     //Total credits
     uint256 private _totalSupply;
 
+	 /**
+     * @dev Emitted when `value` tokens are deposited from one account (`from`) to
+     * the providers vault (``).
+     *
+     * Note that `data1` and `data2' may be zero. and it's left up to the provider to implement
+     */
+
+    event Deposited(address indexed from, address indexed tokenAddress, uint256 value, uint256 data1, uint256 data2);
+
 	constructor(
 		address _masset,
 		ISavingsContract _savings,
@@ -90,6 +99,8 @@ contract MStableProvider is IElDoradoSavingsProvider, Context, IERC20, ERC20Deta
 		_mint(account, savings.depositSavings(massetsMinted)); //depositSavings returns credits
 
 		totalDeposited += massetsMinted;
+
+		emit Deposited(account, _tokenAddress, _amount, savings.exchangeRate(), 0);
 
 		return massetsMinted;
 	}

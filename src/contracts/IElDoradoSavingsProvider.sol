@@ -18,5 +18,13 @@ interface IElDoradoSavingsProvider {
 
     function getListOfDepositableTokens() external view returns(address[] memory);
     function getListOfWithdrawableTokens() external view returns(address[] memory);
-   
+
+     /**
+     * @dev Emitted when `value` tokens are deposited from one account (`from`) to
+     * the providers vault (``).
+     *
+     * Note that `data1` and `data2' may be zero. and it's left up to the provider to implement
+     */
+
+    event Deposited(address indexed from, address indexed tokenAddress, uint256 value, uint256 data1, uint256 data2);
 }

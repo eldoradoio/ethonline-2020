@@ -6,5 +6,5 @@ type TokenAPYProps = {
 }
 
 export function TokenAPY({ tokenApy }: TokenAPYProps) {
-    return (<div style={{ marginLeft: '1rem'}}>{tokenApy.apy.toString()}% APY</div>)
+    return (<span style={{ marginLeft: '1rem'}}>{tokenApy.apy.toString()}% APY</span>)
 }
