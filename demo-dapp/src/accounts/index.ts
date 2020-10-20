@@ -133,6 +133,7 @@ export type ProviderData = {
     name: string
     depositable: TokenData[]
     tokenizedName?: string
+    providerTokenAPY?: TokenAPYData
 }
 
 export async function getProviderData(providerAddress: string): Promise<ProviderData> {
@@ -159,7 +160,9 @@ export async function getProviderData(providerAddress: string): Promise<Provider
         name: name,
         depositable: depositable,
         address: providerAddress,
-        tokenizedName: tokenizedName
+        tokenizedName: tokenizedName,
+        //If it's a tokenized provider, then we put it here
+        providerTokenAPY: tokenizedName ? await getAPYForProvider(providerAddress, providerAddress, name) : undefined
     }
 }
 
@@ -167,4 +170,26 @@ export async function getAllProviders() {
     const addresses = await getProvidersAddressList();
     const providers = await Promise.all(addresses.map(getProviderData))
     return providers
+}
+
+export type TokenAPYData = {
+    tokenAddress: string,
+    apy: BigNumber
+}
+
+export async function getAPYForProvider(providerAddress: string, tokenAddress: string, providerName?: string): Promise<TokenAPYData | undefined> {
+    let name = providerName
+    if (!name) {
+        const savingProvider = IElDoradoSavingsProviderFactory.connect(providerAddress, provider);
+        name = await savingProvider.getProviderName()
+    }
+
+    if (name.toLocaleLowerCase() === 'mstable') {
+        return {
+            tokenAddress: tokenAddress,
+            apy: BigNumber.from('12')
+        }
+    }
+
+    return undefined
 }

@@ -92,11 +92,11 @@ export function WithdrawTokens({ tokenAddress: token, provider }: AccountProps) 
                         <select
                             defaultValue='-'
                             onChange={(e) => setSelectedToken(e.target.value)} >
-                            <option value="-" selected disabled>
+                            <option value="-" disabled>
                                Select Token
                             </option>
                             {provider.depositable.map(x => (
-                                <option value={x.address}>
+                                <option key={`select-${provider.id}-${x.address}`} value={x.address}>
                                     {x.name}
                                 </option>
                             ))}

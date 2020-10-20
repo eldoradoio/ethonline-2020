@@ -10,11 +10,12 @@ export function DepositTap({ providers }: DepositTapProps) {
  
     const depositable = providers.map(x => {
         const accountItems = x.depositable?.map(x => {
-            return (<DepositAccount key={x.address} token={x} ></DepositAccount>)
+      
+            return (<DepositAccount key={`depositaccount${x.address}`} token={x} ></DepositAccount>)
         })
 
         return (
-            <div className="provider">
+            <div key={`depositprovider${x.id}`} className="provider">
                 {accountItems}
             </div>
         )

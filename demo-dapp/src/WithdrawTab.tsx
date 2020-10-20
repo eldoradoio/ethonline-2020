@@ -1,5 +1,6 @@
 import React from "react";
-import { ProviderData } from "./accounts";
+import { ProviderData, TokenAPYData } from "./accounts";
+import { TokenAPY } from "./components/TokenAPY";
 import { WithdrawTokens } from "./WithdrawTokens";
 
 type WithdrawTabProps = {
@@ -14,9 +15,12 @@ export function WithdrawTab({ providers }: WithdrawTabProps) {
         if (x.name === "mStable") {
             //in mstable case, all the tokens are group together, so we cant show them individually
             return (
-                <div className="provider">
+                <div key={x.id} className="provider">
                     <div>
-                        <strong>USD:</strong>
+                        <div>
+                            <strong>USD:</strong>
+                            {x.providerTokenAPY ? <TokenAPY tokenApy={x.providerTokenAPY} /> : <span>no</span>}
+                        </div>
                         <WithdrawTokens key={'mstablewithdraw'} provider={x} />
                     </div>
                 </div>
@@ -30,7 +34,7 @@ export function WithdrawTab({ providers }: WithdrawTabProps) {
                         tokenAddress={tokenAddress} />)
             })
             return (
-                <div className="provider">
+                <div key={x.id} className="provider">
                     <strong>Other tokens:</strong>
                     <div>
                         {accountItems}

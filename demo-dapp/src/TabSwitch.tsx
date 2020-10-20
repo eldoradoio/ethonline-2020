@@ -7,11 +7,11 @@ type TabSwitchProp = {
 }
 
 export function TabSwitch({ children, labels }: TabSwitchProp) {
-    const [tabIndex, setTabIndex] = useState<number>(0)
+    const [tabIndex, setTabIndex] = useState<number>(1)
 
     const switches = Array.from({ length: children.length }, (x, i) =>
         (
-            <div className={`switch-button ${ i === tabIndex ? "selected" : ""}`} onClick={()=>setTabIndex(i)}>
+            <div key={`switch_${i}`} className={`switch-button ${ i === tabIndex ? "selected" : ""}`} onClick={()=>setTabIndex(i)}>
                 {labels[i]}
             </div>
         ))
