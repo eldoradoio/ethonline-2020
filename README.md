@@ -31,7 +31,7 @@ yarn run generate:types
 ``` 
 
 Dapp
-```
+```bash
 cd demo-dapp
 yarn install
 yarn start
